@@ -1,0 +1,3 @@
+3.13
+pip install drf-spectacular drf-spectacular[sidecar]
+

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container mx-auto p-4 flex">
+        <aside class="w-1/4 bg-primary text-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold mb-6">Administration</h2>
+            <ul class="space-y-3">
+                <li><a href="{% url 'users:user_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Créer un utilisateur</a></li>
+                <li><a href="{% url 'blog:article_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Créer un article</a></li>
+                <li><a href="{% url 'blog:comment_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Écrire un commentaire</a></li>
+                <li><a href="{% url 'contact:message_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Envoyer un message</a></li>
+                <li><a href="{% url 'users:logout' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Déconnexion</a></li>
+                <li><a href="#users" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des utilisateurs</a></li>
+                <li><a href="#articles" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des articles</a></li>
+                <li><a href="#comments" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des commentaires</a></li>
+                <li><a href="#messages" class="block py-2 px-4 rounded hover:bg-accent transition">Messages</a></li>
+            </ul>
+        </aside>
+        <div class="w-3/4 p-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="card bg-white shadow-lg p-4 rounded-lg">
+                    <p class="text-lg font-semibold text-primary">Utilisateurs</p>
+                    <p class="text-2xl">{{ user_count }}</p>
+                </div>
+                <div class="card bg-white shadow-lg p-4 rounded-lg">
+                    <p class="text-lg font-semibold text-primary">Articles</p>
+                    <p class="text-2xl">{{ article_count }}</p>
+                </div>
+                <div class="card bg-white shadow-lg p-4 rounded-lg">
+                    <p class="text-lg font-semibold text-primary">Commentaires</p>
+                    <p class="text-2xl">{{ comment_count }}</p>
+                </div>
+                <div class="card bg-white shadow-lg p-4 rounded-lg">
+                    <p class="text-lg font-semibold text-primary">Messages</p>
+                    <p class="text-2xl">{{ message_count }}</p>
+                </div>
+            </div>
+            <section id="users">
+                <h2 class="text-2xl font-bold text-primary mb-4">Utilisateurs</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for user in users %}
+                        <div class="card bg-white shadow-lg p-4 rounded-lg">
+                            <p class="text-xl font-semibold text-primary">{{ user.username }}</p>
+                            <p class="text-gray-600">{{ user.email }}</p>
+                            <div class="space-x-2">
+                                <a href="{% url 'users:user_detail' user.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
+                                <button onclick="openEditUserModal({{ user.id }}, '{{ user.username }}', '{{ user.email }}')" class="bg-accent text-white p-2 rounded">Modifier</button>
+                                <button onclick="openDeleteUserModal({{ user.id }})" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+            <section id="articles">
+                <h2 class="text-2xl font-bold text-primary mb-4">Articles</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for article in articles %}
+                        <div class="card bg-white shadow-lg p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-primary">{{ article.title }}</h3>
+                            <p class="text-gray-600">{{ article.description|truncatewords:30 }}</p>
+                            <p class="text-sm text-gray-500">Par {{ article.author.username }}</p>
+                            <div class="space-x-2">
+                                <a href="{% url 'blog:article_detail' article.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
+                                <a href="{% url 'blog:article_edit' article.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
+                                <form method="post" action="{% url 'blog:article_delete' article.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+            <section id="comments">
+                <h2 class="text-2xl font-bold text-primary mb-4">Commentaires</h2>
+                <div class="space-y-4">
+                    {% for comment in comments %}
+                        <div class="card bg-white shadow-lg p-4 rounded-lg">
+                            <p class="text-gray-600">{{ comment.content }}</p>
+                            <p class="text-sm text-gray-500">Par {{ comment.author.username }} sur {{ comment.article.title }}</p>
+                            <p class="text-sm text-gray-500">Publié : {{ comment.published|yesno:"Oui,Non" }}</p>
+                            <div class="space-x-2">
+                                <a href="{% url 'blog:comment_detail' comment.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
+                                <a href="{% url 'blog:comment_edit' comment.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
+                                <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+            <section id="messages">
+                <h2 class="text-2xl font-bold text-primary mb-4">Messages</h2>
+                <div class="space-y-4">
+                    {% for message in messages %}
+                        <div class="card bg-white shadow-lg p-4 rounded-lg">
+                            <p class="text-xl font-semibold text-primary">{{ message.subject }}</p>
+                            <p class="text-gray-600">{{ message.message|truncatewords:30 }}</p>
+                            <p class="text-sm text-gray-500">Par {{ message.user.username|default:'Anonyme' }}</p>
+                            <p class="text-sm text-gray-500">Lu : {{ message.is_read|yesno:"Oui,Non" }}</p>
+                            <div class="space-x-2">
+                                <a href="{% url 'contact:message_detail' message.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
+                                <a href="{% url 'contact:message_reply' message.id %}" class="bg-accent text-white p-2 rounded">Répondre</a>
+                                <form method="post" action="{% url 'contact:message_delete' message.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Modal pour modifier un utilisateur -->
+            <div id="edit-user-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h3 class="text-xl font-bold mb-4">Modifier l'utilisateur</h3>
+                    <form method="post" id="edit-user-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="edit-user-id">
+                        <div class="mb-4">
+                            <label for="edit-username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                            <input type="text" name="username" id="edit-username" class="mt-1 block w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" id="edit-email" class="mt-1 block w-full p-2 border rounded">
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="bg-gray-500 text-white p-2 rounded">Annuler</button>
+                            <button type="submit" class="bg-accent text-white p-2 rounded">Modifier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal pour supprimer un utilisateur -->
+            <div id="delete-user-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h3 class="text-xl font-bold mb-4">Supprimer l'utilisateur</h3>
+                    <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ?</p>
+                    <form method="post" id="delete-user-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="delete-user-id">
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="document.getElementById('delete-user-modal').classList.add('hidden')" class="bg-gray-500 text-white p-2 rounded">Annuler</button>
+                            <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openEditUserModal(id, username, email) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-username').value = username;
+            document.getElementById('edit-email').value = email;
+            document.getElementById('edit-user-form').action = `/users/user/${id}/edit/`;
+            document.getElementById('edit-user-modal').classList.remove('hidden');
+        }
+
+        function openDeleteUserModal(id) {
+            document.getElementById('delete-user-id').value = id;
+            document.getElementById('delete-user-form').action = `/users/user/${id}/delete/`;
+            document.getElementById('delete-user-modal').classList.remove('hidden');
+        }
+    </script>
+{% endblock %}

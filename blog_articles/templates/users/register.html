@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">Inscription</h2>
+        {% if error %}
+            <p class="text-red-500">{{ error }}</p>
+        {% endif %}
+        <form method="post" action="{% url 'users:register' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700">Nom d'utilisateur</label>
+                <input type="text" name="username" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Email</label>
+                <input type="email" name="email" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Mot de passe</label>
+                <input type="password" name="password" class="w-full p-2 border rounded">
+            </div>
+            <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700 text-secondary">S'inscrire</button>
+        </form>
+    </div>
+{% endblock %}

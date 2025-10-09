@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">Contact</h2>
+        {% if success %}
+            <p class="text-green-500">{{ success }}</p>
+        {% endif %}
+        <form method="post" action="{% url 'users:contact' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700">Sujet</label>
+                <input type="text" name="subject" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Message</label>
+                <textarea name="message" class="w-full p-2 border rounded"></textarea>
+            </div>
+            {% if not user.is_authenticated %}
+                <div class="mb-4">
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" name="email" class="w-full p-2 border rounded">
+                </div>
+            {% endif %}
+            <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Envoyer</button>
+        </form>
+    </div>
+{% endblock %}

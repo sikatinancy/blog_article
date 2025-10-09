@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">{% if comment %}Modifier{% else %}Créer{% endif %} un commentaire</h2>
+        {% if error %}
+            <p class="text-red-500">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700">Article</label>
+                <select name="article" class="w-full p-2 border rounded">
+                    {% for article in articles %}
+                        <option value="{{ article.id }}" {% if comment.article.id == article.id %}selected{% endif %}>{{ article.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Commentaire</label>
+                <textarea name="content" class="w-full p-2 border rounded">{{ comment.content|default_if_none:'' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Publié</label>
+                <input type="checkbox" name="published" {% if comment.published %}checked{% endif %}>
+            </div>
+            <div class="flex space-x-2">
+                <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Enregistrer</button>
+                <a href="{% url 'users:dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Annuler</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

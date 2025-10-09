@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">Détails du commentaire</h2>
+        <p><strong>Article :</strong> {{ comment.article.title }}</p>
+        <p><strong>Contenu :</strong> {{ comment.content }}</p>
+        <p><strong>Publié :</strong> {{ comment.published|yesno:"Oui,Non" }}</p>
+        <div class="flex space-x-2 mt-4">
+            <a href="{% url 'blog:comment_edit' comment.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
+            <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+            </form>
+            <a href="{% url 'users:dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Retour</a>
+        </div>
+    </div>
+{% endblock %}

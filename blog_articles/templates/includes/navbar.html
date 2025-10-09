@@ -1,0 +1,47 @@
+<nav class="bg-gradient-to-r from-primary to-accent text-white shadow-md py-3">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-white font-bold text-lg">BlogApp</a>
+    </div>
+
+    <div class="hidden md:flex items-center gap-4">
+      <a href="/" class="px-3 py-2 rounded hover:bg-accent/80">Accueil</a>
+      <a href="/articles/" class="px-3 py-2 rounded hover:bg-accent/80">Articles</a>
+      <a href="/contact/" class="px-3 py-2 rounded hover:bg-accent/80">Contact</a>
+      <a href="/commentaires/" class="px-3 py-2 rounded hover:bg-accent/80">Commentaire</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'users:register' %}" class="px-3 py-2 rounded bg-white text-primary font-semibold">Mon compte</a>
+      {% else %}
+        <a href="{% url 'users:login' %}" class="px-3 py-2 rounded bg-white text-primary font-semibold">Se connecter</a>
+      {% endif %}
+    </div>
+
+    <div class="md:hidden">
+      <button id="mobile-menu-button" class="p-2 rounded bg-white text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden bg-white text-primary">
+    <a href="/" class="block px-4 py-2 border-b">Accueil</a>
+    <a href="/articles/" class="block px-4 py-2 border-b">Articles</a>
+    <a href="/contact/" class="block px-4 py-2 border-b">Contact</a>
+    <a href="/commentaires/" class="block px-4 py-2 border-b">Commentaire</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'users:dashboard' %}" class="block px-4 py-2">Mon compte</a>
+    {% else %}
+      <a href="{% url 'users:login' %}" class="block px-4 py-2">Se connecter</a>
+    {% endif %}
+  </div>
+
+  <script>
+    document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      if (!menu) return;
+      menu.classList.toggle('hidden');
+    });
+  </script>
+</nav>

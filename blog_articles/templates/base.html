@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogApp</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    {% include 'includes/navbar.html' %}
+</head>
+<body class="bg-background text-gray-800">
+    
+    <main class="container mx-auto p-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="bg-primary text-white p-4 text-center">
+        <p>&copy; 2025 BlogApp. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">Détails du message</h2>
+        <p><strong>Sujet :</strong> {{ message.subject }}</p>
+        <p><strong>Message :</strong> {{ message.message }}</p>
+        <p><strong>Utilisateur :</strong> {{ message.user.username|default:'Anonyme' }}</p>
+        <p><strong>Lu :</strong> {{ message.is_read|yesno:"Oui,Non" }}</p>
+        {% if message.reply %}
+            <p><strong>Réponse :</strong> {{ message.reply }}</p>
+        {% endif %}
+        <div class="flex space-x-2 mt-4">
+            <a href="{% url 'contact:message_edit' message.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
+            <a href="{% url 'contact:message_reply' message.id %}" class="bg-accent text-white p-2 rounded">Répondre</a>
+            <form method="post" action="{% url 'contact:message_delete' message.id %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
+            </form>
+            <a href="{% url 'users:admin_dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Retour</a>
+        </div>
+    </div>
+{% endblock %}

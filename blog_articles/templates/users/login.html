@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg mt-8">
+        <h2 class="text-2xl font-bold text-primary mb-4">Connexion</h2>
+        {% if error %}
+            <p class="text-red-500 mb-4">{{ error }}</p>
+        {% endif %}
+        <form method="post" action="{% url 'users:login' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                <input type="text" name="username" id="username" class="mt-1 block w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                <input type="password" name="password" id="password" class="mt-1 block w-full p-2 border rounded" required>
+            </div>
+            <button type="submit" class="bg-accent text-white p-2 rounded w-full hover:bg-accent-dark transition">Se connecter</button>
+        </form>
+        <p class="mt-4 text-center">
+            Pas de compte ? <a href="{% url 'users:register' %}" class="text-accent hover:underline">S'inscrire</a>
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const errorElement = document.createElement('p');
+            errorElement.className = 'text-red-500 mb-4 hidden';
+            form.prepend(errorElement);
+
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                try {
+                    const response = await fetch("{% url 'users:login' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Stocker les tokens
+                        localStorage.setItem('access_token', data.access_token);
+                        localStorage.setItem('refresh_token', data.refresh_token);
+                        // Rediriger vers une page protégée
+                        window.location.href = '/dashboard/';
+                    } else {
+                        // Afficher l'erreur
+                        errorElement.textContent = data.error || 'Une erreur est survenue';
+                        errorElement.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    errorElement.textContent = 'Erreur de connexion au serveur';
+                    errorElement.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+{% endblock %}

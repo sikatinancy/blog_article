@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-primary mb-4">Répondre au message</h2>
+        {% if error %}
+            <p class="text-red-500">{{ error }}</p>
+        {% endif %}
+        <p><strong>Sujet :</strong> {{ message.subject }}</p>
+        <p><strong>Message :</strong> {{ message.message }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700">Réponse</label>
+                <textarea name="reply" class="w-full p-2 border rounded">{{ message.reply|default_if_none:'' }}</textarea>
+            </div>
+            <div class="flex space-x-2">
+                <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Envoyer</button>
+                <a href="{% url 'users:admin_dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Annuler</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

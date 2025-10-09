@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container mx-auto p-4">
+        <h2 class="text-2xl font-bold text-primary mb-4">{% if article %}Modifier l'article{% else %}Créer un article{% endif %}</h2>
+        {% if error %}
+            <p class="text-red-500 mb-4">{{ error }}</p>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
+                <input type="text" name="title" id="title" value="{{ article.title|default_if_none:'' }}" class="mt-1 block w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea name="description" id="description" class="mt-1 block w-full p-2 border rounded" required>{{ article.description|default_if_none:'' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label for="content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                <textarea name="content" id="content" class="mt-1 block w-full p-2 border rounded" required>{{ article.content|default_if_none:'' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                <input type="text" name="category" id="category" value="{{ article.category|default_if_none:'' }}" class="mt-1 block w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
+                <input type="file" name="image" id="image" class="mt-1 block w-full p-2 border rounded" accept="image/*">
+                {% if article.image %}
+                    <p class="text-sm text-gray-500">Image actuelle : {{ article.image.url }}</p>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="published" class="block text-sm font-medium text-gray-700">Publié</label>
+                <input type="checkbox" name="published" id="published" class="mt-1" {% if article.published %}checked{% endif %}>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <a href="{% url 'users:dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Annuler</a>
+                <button type="submit" class="bg-accent text-white p-2 rounded">{% if article %}Modifier{% else %}Créer{% endif %}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
