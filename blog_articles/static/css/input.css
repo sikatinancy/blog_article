@@ -480,7 +480,7 @@
         color: #fff !important;
     }
         /* Carousel Styles */
-        .carousel {
+        /* .carousel {
             position: relative;
             background: linear-gradient(90deg, #1e3a8a 0%, #ff9256 100%);
             box-shadow: 0 4px 24px 0 rgba(30, 58, 138, 0.10);
@@ -489,7 +489,7 @@
             border-radius: 1rem;
             box-shadow: 0 2px 8px 0 rgba(30, 58, 138, 0.10);
             border: 3px solid #fff;
-        }
+        } */
 
         /* Hero Section */
         .hero-section {

@@ -1,171 +1,1433 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="container mx-auto p-4 flex">
-        <aside class="w-1/4 bg-primary text-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-xl font-bold mb-6">Administration</h2>
-            <ul class="space-y-3">
-                <li><a href="{% url 'users:user_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Créer un utilisateur</a></li>
-                <li><a href="{% url 'blog:article_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Créer un article</a></li>
-                <li><a href="{% url 'blog:comment_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Écrire un commentaire</a></li>
-                <li><a href="{% url 'contact:message_create' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Envoyer un message</a></li>
-                <li><a href="{% url 'users:logout' %}" class="block py-2 px-4 rounded hover:bg-accent transition">Déconnexion</a></li>
-                <li><a href="#users" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des utilisateurs</a></li>
-                <li><a href="#articles" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des articles</a></li>
-                <li><a href="#comments" class="block py-2 px-4 rounded hover:bg-accent transition">Liste des commentaires</a></li>
-                <li><a href="#messages" class="block py-2 px-4 rounded hover:bg-accent transition">Messages</a></li>
-            </ul>
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - BlogApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #2563eb;
+            --accent: #ff9256;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 4px 0 20px rgba(30, 58, 138, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header h2 i {
+            color: var(--accent);
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-title {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0.25rem 0;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.users::before { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .stat-card.articles::before { background: linear-gradient(135deg, var(--success), #34d399); }
+        .stat-card.comments::before { background: linear-gradient(135deg, var(--warning), #fbbf24); }
+        .stat-card.messages::before { background: linear-gradient(135deg, var(--info), #60a5fa); }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.users .stat-icon { background: rgba(30, 58, 138, 0.1); color: var(--primary); }
+        .stat-card.articles .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.comments .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-card.messages .stat-icon { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card.users .stat-value { color: var(--primary); }
+        .stat-card.articles .stat-value { color: var(--success); }
+        .stat-card.comments .stat-value { color: var(--warning); }
+        .stat-card.messages .stat-value { color: var(--info); }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #c7d2fe;
+        }
+
+        .card-header {
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .card-meta {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-panel {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        .btn-primary {
+            background: #6b7280;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <i class="fas fa-crown"></i>
+                    Super Admin
+                </h2>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Création</div>
+                <ul class="nav-links">
+                    <li><a href="{% url 'users:user_create' %}" class="active" onclick="openCreateUserModal(); return false;">
+                        <i class="fas fa-user-plus"></i>
+                        Créer un utilisateur
+                    </a></li>
+                    <li><a href="{% url 'blog:article_create' %}" onclick="openCreateArticleModal(); return false;">
+                        <i class="fas fa-edit"></i>
+                        Créer un article
+                    </a></li>
+                    <li><a href="{% url 'blog:comment_create' %}" onclick="openCreateCommentModal(); return false;">
+                        <i class="fas fa-comment"></i>
+                        Écrire un commentaire
+                    </a></li>
+                    <li><a href="{% url 'contact:message_create' %}" onclick="openCreateMessageModal(); return false;">
+                        <i class="fas fa-envelope"></i>
+                        Envoyer un message
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Gestion</div>
+                <ul class="nav-links">
+                    <li><a href="#users">
+                        <i class="fas fa-users"></i>
+                        Liste des utilisateurs
+                    </a></li>
+                    <li><a href="#articles">
+                        <i class="fas fa-newspaper"></i>
+                        Liste des articles
+                    </a></li>
+                    <li><a href="#comments">
+                        <i class="fas fa-comments"></i>
+                        Liste des commentaires
+                    </a></li>
+                    <li><a href="#messages">
+                        <i class="fas fa-inbox"></i>
+                        Messages
+                    </a></li>
+                </ul>
+            </div>
         </aside>
-        <div class="w-3/4 p-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="card bg-white shadow-lg p-4 rounded-lg">
-                    <p class="text-lg font-semibold text-primary">Utilisateurs</p>
-                    <p class="text-2xl">{{ user_count }}</p>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de Bord Administrateur
+                </h1>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card users">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ user_count }}</div>
+                    <div class="stat-label">Utilisateurs</div>
                 </div>
-                <div class="card bg-white shadow-lg p-4 rounded-lg">
-                    <p class="text-lg font-semibold text-primary">Articles</p>
-                    <p class="text-2xl">{{ article_count }}</p>
+                <div class="stat-card articles">
+                    <div class="stat-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="stat-value">{{ article_count }}</div>
+                    <div class="stat-label">Articles</div>
                 </div>
-                <div class="card bg-white shadow-lg p-4 rounded-lg">
-                    <p class="text-lg font-semibold text-primary">Commentaires</p>
-                    <p class="text-2xl">{{ comment_count }}</p>
+                <div class="stat-card comments">
+                    <div class="stat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-value">{{ comment_count }}</div>
+                    <div class="stat-label">Commentaires</div>
                 </div>
-                <div class="card bg-white shadow-lg p-4 rounded-lg">
-                    <p class="text-lg font-semibold text-primary">Messages</p>
-                    <p class="text-2xl">{{ message_count }}</p>
+                <div class="stat-card messages">
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="stat-value">{{ message_count }}</div>
+                    <div class="stat-label">Messages</div>
                 </div>
             </div>
-            <section id="users">
-                <h2 class="text-2xl font-bold text-primary mb-4">Utilisateurs</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Users Section -->
+            <section id="users" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-users"></i>
+                        Utilisateurs
+                    </h2>
+                </div>
+                <div class="cards-grid">
                     {% for user in users %}
-                        <div class="card bg-white shadow-lg p-4 rounded-lg">
-                            <p class="text-xl font-semibold text-primary">{{ user.username }}</p>
-                            <p class="text-gray-600">{{ user.email }}</p>
-                            <div class="space-x-2">
-                                <a href="{% url 'users:user_detail' user.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
-                                <button onclick="openEditUserModal({{ user.id }}, '{{ user.username }}', '{{ user.email }}')" class="bg-accent text-white p-2 rounded">Modifier</button>
-                                <button onclick="openDeleteUserModal({{ user.id }})" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
-                            </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ user.username }}</h3>
+                            <p class="card-description">{{ user.email }}</p>
                         </div>
+                        <div class="card-meta">
+                            Membre depuis {{ user.date_joined|date:"d/m/Y" }}
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'users:user_detail' user.id %}" class="btn btn-view">
+                                <i class="fas fa-eye"></i>Voir
+                            </a>
+                            <button onclick="openEditUserModal({{ user.id }}, '{{ user.username|escapejs }}', '{{ user.email|escapejs }}')" 
+                                    class="btn btn-edit">
+                                <i class="fas fa-edit"></i>Modifier
+                            </button>
+                            <button onclick="openDeleteUserModal({{ user.id }})" 
+                                    class="btn btn-delete">
+                                <i class="fas fa-trash"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>
-            <section id="articles">
-                <h2 class="text-2xl font-bold text-primary mb-4">Articles</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Articles Section -->
+            <section id="articles" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-newspaper"></i>
+                        Articles
+                    </h2>
+                </div>
+                <div class="cards-grid">
                     {% for article in articles %}
-                        <div class="card bg-white shadow-lg p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-primary">{{ article.title }}</h3>
-                            <p class="text-gray-600">{{ article.description|truncatewords:30 }}</p>
-                            <p class="text-sm text-gray-500">Par {{ article.author.username }}</p>
-                            <div class="space-x-2">
-                                <a href="{% url 'blog:article_detail' article.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
-                                <a href="{% url 'blog:article_edit' article.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
-                                <form method="post" action="{% url 'blog:article_delete' article.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
-                                </form>
-                            </div>
+                    <div class="card" data-id="{{ article.id }}">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ article.title }}</h3>
+                            <p class="card-description">{{ article.description|truncatewords:30 }}</p>
                         </div>
+                        <div class="card-meta">
+                            Par {{ article.author.username }} • {{ article.created_at|date:"d/m/Y" }}
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'blog:article_detail' article.id %}" class="btn btn-view">
+                                <i class="fas fa-eye"></i>Voir
+                            </a>
+                            <button class="btn btn-edit edit-article-btn"
+                                    data-id="{{ article.id }}"
+                                    data-title="{{ article.title|escapejs }}"
+                                    data-description="{{ article.description|escapejs }}"
+                                    data-content="{{ article.content|escapejs }}"
+                                    data-category="{{ article.category|default_if_none:''|escapejs }}"
+                                    data-published="{{ article.published|yesno:'true,false' }}"
+                                    data-image="{% if article.image %}{{ article.image.url|escapejs }}{% else %}''{% endif %}">
+                                <i class="fas fa-edit"></i>Modifier
+                            </button>
+                            <button class="btn btn-delete delete-btn" data-id="{{ article.id }}" data-type="article">
+                                <i class="fas fa-trash"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>
-            <section id="comments">
-                <h2 class="text-2xl font-bold text-primary mb-4">Commentaires</h2>
-                <div class="space-y-4">
+
+            <!-- Comments Section -->
+            <section id="comments" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-comments"></i>
+                        Commentaires
+                    </h2>
+                </div>
+                <div class="cards-grid">
                     {% for comment in comments %}
-                        <div class="card bg-white shadow-lg p-4 rounded-lg">
-                            <p class="text-gray-600">{{ comment.content }}</p>
-                            <p class="text-sm text-gray-500">Par {{ comment.author.username }} sur {{ comment.article.title }}</p>
-                            <p class="text-sm text-gray-500">Publié : {{ comment.published|yesno:"Oui,Non" }}</p>
-                            <div class="space-x-2">
-                                <a href="{% url 'blog:comment_detail' comment.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
-                                <a href="{% url 'blog:comment_edit' comment.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
-                                <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
-                                </form>
-                            </div>
+                    <div class="card" data-id="{{ comment.id }}">
+                        <div class="card-header">
+                            <p class="card-description">{{ comment.content }}</p>
                         </div>
+                        <div class="card-meta">
+                            Par {{ comment.author.username }} sur {{ comment.article.title }} • 
+                            Publié : {{ comment.published|yesno:"Oui,Non" }}
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'blog:comment_detail' comment.id %}" class="btn btn-view">
+                                <i class="fas fa-eye"></i>Voir
+                            </a>
+                            <button class="btn btn-edit edit-comment-btn"
+                                    data-id="{{ comment.id }}"
+                                    data-content="{{ comment.content|escapejs }}"
+                                    data-article-id="{{ comment.article.id }}"
+                                    data-published="{{ comment.published|yesno:'true,false' }}">
+                                <i class="fas fa-edit"></i>Modifier
+                            </button>
+                            <button class="btn btn-delete delete-btn" data-id="{{ comment.id }}" data-type="comment">
+                                <i class="fas fa-trash"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>
-            <section id="messages">
-                <h2 class="text-2xl font-bold text-primary mb-4">Messages</h2>
-                <div class="space-y-4">
+
+            <!-- Messages Section -->
+            <section id="messages" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-inbox"></i>
+                        Messages
+                    </h2>
+                </div>
+                <div class="cards-grid">
                     {% for message in messages %}
-                        <div class="card bg-white shadow-lg p-4 rounded-lg">
-                            <p class="text-xl font-semibold text-primary">{{ message.subject }}</p>
-                            <p class="text-gray-600">{{ message.message|truncatewords:30 }}</p>
-                            <p class="text-sm text-gray-500">Par {{ message.user.username|default:'Anonyme' }}</p>
-                            <p class="text-sm text-gray-500">Lu : {{ message.is_read|yesno:"Oui,Non" }}</p>
-                            <div class="space-x-2">
-                                <a href="{% url 'contact:message_detail' message.id %}" class="bg-primary text-white p-2 rounded">Voir</a>
-                                <a href="{% url 'contact:message_reply' message.id %}" class="bg-accent text-white p-2 rounded">Répondre</a>
-                                <form method="post" action="{% url 'contact:message_delete' message.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
-                                </form>
-                            </div>
+                    <div class="card" data-id="{{ message.id }}">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ message.subject }}</h3>
+                            <p class="card-description">{{ message.message|truncatewords:30 }}</p>
                         </div>
+                        <div class="card-meta">
+                            Par {{ message.user.username|default:'Anonyme' }} • 
+                            Lu : {{ message.is_read|yesno:"Oui,Non" }}
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'contact:message_detail' message.id %}" class="btn btn-view">
+                                <i class="fas fa-eye"></i>Voir
+                            </a>
+                            <button class="btn btn-edit edit-message-btn"
+                                    data-id="{{ message.id }}"
+                                    data-subject="{{ message.subject|escapejs }}"
+                                    data-message="{{ message.message|escapejs }}"
+                                    data-user-id="{{ message.user.id|default_if_none:'' }}"
+                                    data-is-read="{{ message.is_read|yesno:'true,false' }}">
+                                <i class="fas fa-edit"></i>Modifier
+                            </button>
+                            <button class="btn btn-delete delete-btn" data-id="{{ message.id }}" data-type="message">
+                                <i class="fas fa-trash"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>
-
-            <!-- Modal pour modifier un utilisateur -->
-            <div id="edit-user-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                    <h3 class="text-xl font-bold mb-4">Modifier l'utilisateur</h3>
-                    <form method="post" id="edit-user-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="id" id="edit-user-id">
-                        <div class="mb-4">
-                            <label for="edit-username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-                            <input type="text" name="username" id="edit-username" class="mt-1 block w-full p-2 border rounded">
-                        </div>
-                        <div class="mb-4">
-                            <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="edit-email" class="mt-1 block w-full p-2 border rounded">
-                        </div>
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="bg-gray-500 text-white p-2 rounded">Annuler</button>
-                            <button type="submit" class="bg-accent text-white p-2 rounded">Modifier</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal pour supprimer un utilisateur -->
-            <div id="delete-user-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                    <h3 class="text-xl font-bold mb-4">Supprimer l'utilisateur</h3>
-                    <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ?</p>
-                    <form method="post" id="delete-user-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="id" id="delete-user-id">
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" onclick="document.getElementById('delete-user-modal').classList.add('hidden')" class="bg-gray-500 text-white p-2 rounded">Annuler</button>
-                            <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
     </div>
 
+    <!-- Modals -->
+    <div id="create-user-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Créer un utilisateur</h3>
+            <form method="post" id="create-user-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="create-username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                    <input type="text" name="username" id="create-username" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="create-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" id="create-email" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="create-password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                    <input type="password" name="password" id="create-password" class="form-control" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('create-user-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Créer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="edit-user-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier l'utilisateur</h3>
+            <form method="post" id="edit-user-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-user-id">
+                <div class="mb-4">
+                    <label for="edit-username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                    <input type="text" name="username" id="edit-username" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" id="edit-email" class="form-control" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="delete-user-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Supprimer l'utilisateur</h3>
+            <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ?</p>
+            <form method="post" id="delete-user-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-user-id">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('delete-user-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Créer un article</h3>
+            <form method="post" id="create-article-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="create-title" class="block text-sm font-medium text-gray-700">Titre</label>
+                    <input type="text" name="title" id="create-title" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="create-description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" id="create-description" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="create-content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                    <textarea name="content" id="create-content" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="create-category" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <input type="text" name="category" id="create-category" class="form-control">
+                </div>
+                <div class="mb-4">
+                    <label for="create-image" class="block text-sm font-medium text-gray-700">Image</label>
+                    <input type="file" name="image" id="create-image" class="form-control" accept="image/*">
+                </div>
+                <div class="mb-4">
+                    <label for="create-published" class="block text-sm font-medium text-gray-700">Publié</label>
+                    <input type="checkbox" name="published" id="create-published" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('create-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Créer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
+            <form method="post" id="edit-article-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-article-id">
+                <div class="mb-4">
+                    <label for="edit-title" class="block text-sm font-medium text-gray-700">Titre</label>
+                    <input type="text" name="title" id="edit-title" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" id="edit-description" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                    <textarea name="content" id="edit-content" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-category" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <input type="text" name="category" id="edit-category" class="form-control">
+                </div>
+                <div class="mb-4">
+                    <label for="edit-image" class="block text-sm font-medium text-gray-700">Image</label>
+                    <input type="file" name="image" id="edit-image" class="form-control" accept="image/*">
+                    <p id="current-image" class="text-sm muted"></p>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-published" class="block text-sm font-medium text-gray-700">Publié</label>
+                    <input type="checkbox" name="published" id="edit-published" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('edit-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Supprimer l'article</h3>
+            <p>Êtes-vous sûr de vouloir supprimer cet article ?</p>
+            <form method="post" id="delete-article-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-article-id">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('delete-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
+            <form method="post" id="create-comment-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="create-content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                    <textarea name="content" id="create-content" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="create-article" class="block text-sm font-medium text-gray-700">Article</label>
+                    <select name="article" id="create-article" class="form-control">
+                        {% for article in articles %}
+                        <option value="{{ article.id }}">{{ article.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="create-published" class="block text-sm font-medium text-gray-700">Publié</label>
+                    <input type="checkbox" name="published" id="create-published" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('create-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Créer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
+            <form method="post" id="edit-comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-comment-id">
+                <div class="mb-4">
+                    <label for="edit-content" class="block text-sm font-medium text-gray-700">Contenu</label>
+                    <textarea name="content" id="edit-content" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-article" class="block text-sm font-medium text-gray-700">Article</label>
+                    <select name="article" id="edit-article" class="form-control">
+                        {% for article in articles %}
+                        <option value="{{ article.id }}">{{ article.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-published" class="block text-sm font-medium text-gray-700">Publié</label>
+                    <input type="checkbox" name="published" id="edit-published" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('edit-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Supprimer le commentaire</h3>
+            <p>Êtes-vous sûr de vouloir supprimer ce commentaire ?</p>
+            <form method="post" id="delete-comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-comment-id">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('delete-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="create-message-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Envoyer un message</h3>
+            <form method="post" id="create-message-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="create-subject" class="block text-sm font-medium text-gray-700">Sujet</label>
+                    <input type="text" name="subject" id="create-subject" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="create-message" class="block text-sm font-medium text-gray-700">Message</label>
+                    <textarea name="message" id="create-message" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="create-user" class="block text-sm font-medium text-gray-700">Utilisateur</label>
+                    <select name="user" id="create-user" class="form-control">
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="create-is-read" class="block text-sm font-medium text-gray-700">Lu</label>
+                    <input type="checkbox" name="is_read" id="create-is-read" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('create-message-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Envoyer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="edit-message-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier le message</h3>
+            <form method="post" id="edit-message-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-message-id">
+                <div class="mb-4">
+                    <label for="edit-subject" class="block text-sm font-medium text-gray-700">Sujet</label>
+                    <input type="text" name="subject" id="edit-subject" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-message" class="block text-sm font-medium text-gray-700">Message</label>
+                    <textarea name="message" id="edit-message" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-user" class="block text-sm font-medium text-gray-700">Utilisateur</label>
+                    <select name="user" id="edit-user" class="form-control">
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-is-read" class="block text-sm font-medium text-gray-700">Lu</label>
+                    <input type="checkbox" name="is_read" id="edit-is-read" class="form-control">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('edit-message-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
+    <div id="delete-message-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <cfformat>
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Supprimer le message</h3>
+            <p>Êtes-vous sûr de vouloir supprimer ce message ?</p>
+            <form method="post" id="delete-message-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-message-id">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="document.getElementById('delete-message-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+        </cfformat>
+    </div>
+
     <script>
+        // Récupérer le token CSRF
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        // Modal functions
+        function openCreateUserModal() {
+            document.getElementById('create-user-modal').classList.remove('hidden');
+        }
+
+        function openCreateArticleModal() {
+            document.getElementById('create-article-modal').classList.remove('hidden');
+        }
+
+        function openCreateCommentModal() {
+            document.getElementById('create-comment-modal').classList.remove('hidden');
+        }
+
+        function openCreateMessageModal() {
+            document.getElementById('create-message-modal').classList.remove('hidden');
+        }
+
         function openEditUserModal(id, username, email) {
             document.getElementById('edit-user-id').value = id;
             document.getElementById('edit-username').value = username;
             document.getElementById('edit-email').value = email;
-            document.getElementById('edit-user-form').action = `/users/user/${id}/edit/`;
             document.getElementById('edit-user-modal').classList.remove('hidden');
         }
 
         function openDeleteUserModal(id) {
             document.getElementById('delete-user-id').value = id;
-            document.getElementById('delete-user-form').action = `/users/user/${id}/delete/`;
             document.getElementById('delete-user-modal').classList.remove('hidden');
         }
+
+        // Créer Utilisateur
+        document.getElementById('create-user-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'users:user_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur création utilisateur : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la création');
+            }
+        });
+
+        // Modifier Utilisateur
+        document.getElementById('edit-user-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-user-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/users/user/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur modification utilisateur : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la modification');
+            }
+        });
+
+        // Supprimer Utilisateur
+        document.getElementById('delete-user-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-user-id').value;
+            try {
+                const res = await fetch(`/users/user/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur suppression utilisateur : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la suppression');
+            }
+        });
+
+        // Créer Article
+        document.getElementById('create-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'blog:article_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur création article : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la création');
+            }
+        });
+
+        // Ouvrir Modal Modifier Article
+        document.querySelectorAll('.edit-article-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('edit-article-id').value = btn.dataset.id;
+                document.getElementById('edit-title').value = btn.dataset.title;
+                document.getElementById('edit-description').value = btn.dataset.description;
+                document.getElementById('edit-content').value = btn.dataset.content;
+                document.getElementById('edit-category').value = btn.dataset.category;
+                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
+                document.getElementById('current-image').innerText = btn.dataset.image 
+                    ? `Image actuelle : ${btn.dataset.image}`
+                    : 'Aucune image';
+                document.getElementById('edit-article-modal').classList.remove('hidden');
+            });
+        });
+
+        // Modifier Article
+        document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-article-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/blog/articles/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur modification article : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la modification');
+            }
+        });
+
+        // Ouvrir Modal Supprimer Article
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            if (btn.dataset.type === 'article') {
+                btn.addEventListener('click', () => {
+                    document.getElementById('delete-article-id').value = btn.dataset.id;
+                    document.getElementById('delete-article-modal').classList.remove('hidden');
+                });
+            }
+        });
+
+        // Supprimer Article
+        document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-article-id').value;
+            try {
+                const res = await fetch(`/blog/articles/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur suppression article : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la suppression');
+            }
+        });
+
+        // Créer Commentaire
+        document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'blog:comment_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur création commentaire : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la création');
+            }
+        });
+
+        // Ouvrir Modal Modifier Commentaire
+        document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('edit-comment-id').value = btn.dataset.id;
+                document.getElementById('edit-content').value = btn.dataset.content;
+                document.getElementById('edit-article').value = btn.dataset.articleId;
+                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
+                document.getElementById('edit-comment-modal').classList.remove('hidden');
+            });
+        });
+
+        // Modifier Commentaire
+        document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-comment-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/blog/comment/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur modification commentaire : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la modification');
+            }
+        });
+
+        // Ouvrir Modal Supprimer Commentaire
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            if (btn.dataset.type === 'comment') {
+                btn.addEventListener('click', () => {
+                    document.getElementById('delete-comment-id').value = btn.dataset.id;
+                    document.getElementById('delete-comment-modal').classList.remove('hidden');
+                });
+            }
+        });
+
+        // Supprimer Commentaire
+        document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-comment-id').value;
+            try {
+                const res = await fetch(`/blog/comment/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur suppression commentaire : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la suppression');
+            }
+        });
+
+        // Créer Message
+        document.getElementById('create-message-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'contact:message_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur création message : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la création');
+            }
+        });
+
+        // Ouvrir Modal Modifier Message
+        document.querySelectorAll('.edit-message-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('edit-message-id').value = btn.dataset.id;
+                document.getElementById('edit-subject').value = btn.dataset.subject;
+                document.getElementById('edit-message').value = btn.dataset.message;
+                document.getElementById('edit-user').value = btn.dataset.userId;
+                document.getElementById('edit-is-read').checked = btn.dataset.isRead === 'true';
+                document.getElementById('edit-message-modal').classList.remove('hidden');
+            });
+        });
+
+        // Modifier Message
+        document.getElementById('edit-message-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-message-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/contact/message/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur modification message : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la modification');
+            }
+        });
+
+        // Ouvrir Modal Supprimer Message
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            if (btn.dataset.type === 'message') {
+                btn.addEventListener('click', () => {
+                    document.getElementById('delete-message-id').value = btn.dataset.id;
+                    document.getElementById('delete-message-modal').classList.remove('hidden');
+                });
+            }
+        });
+
+        // Supprimer Message
+        document.getElementById('delete-message-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-message-id').value;
+            try {
+                const res = await fetch(`/contact/message/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const err = await res.text();
+                    alert('Erreur suppression message : ' + err);
+                }
+            } catch (error) {
+                alert('Erreur réseau lors de la suppression');
+            }
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
     </script>
-{% endblock %}
+</body>
+</html>
+```

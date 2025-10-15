@@ -6,14 +6,16 @@ from users.views.admin_view import AdminDashboardView
 from users.views.user_views import UserCreateView, UserEditView, UserDeleteView, UserDetailView
 from users.api.viewsets import UserListAPI
 from rest_framework_simplejwt.views import TokenRefreshView
-from users.views.login_view import LoginAPIView
+from users.views.login_view import LoginAPIView,LoginPageView
 from users.views.signup_view import SignupView
 
 app_name = 'users'
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('login/', LoginAPIView.as_view(), name='login'),
+     path('login/', LoginPageView.as_view(), name='login'),
+    path('api/login/', LoginAPIView.as_view(), name='api-login'),
+
     path('register/', SignupView.as_view(), name='register'),
     path('refresh-token/', TokenRefreshView.as_view(), name='token_refresh'),
 

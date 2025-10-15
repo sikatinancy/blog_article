@@ -70,5 +70,5 @@ class ArticleDetailView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['article'] = Article.objects.get(id=self.kwargs['id'], author=self.request.user)
+        context['article'] = Article.objects.get(id=self.kwargs['id'], published=True)
         return context

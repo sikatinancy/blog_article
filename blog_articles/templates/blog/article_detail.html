@@ -1,17 +1,221 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-    <div class="container mx-auto p-4">
-        <h2 class="text-2xl font-bold text-primary mb-4">{{ article.title }}</h2>
-        {% if article.image %}
-            <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full max-w-md h-auto rounded mb-4">
-        {% else %}
-            <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="w-full max-w-md h-auto rounded mb-4">
-        {% endif %}
-        <p class="text-gray-600">{{ article.description }}</p>
-        <p class="text-gray-800">{{ article.content }}</p>
-        <p class="text-sm text-gray-500">Catégorie : {{ article.category }}</p>
-        <p class="text-sm text-gray-500">Publié : {{ article.published|yesno:"Oui,Non" }}</p>
-        <p class="text-sm text-gray-500">Créé le : {{ article.created_at|date:"d/m/Y H:i" }}</p>
-        <a href="{% url 'users:dashboard' %}" class="bg-primary text-white p-2 rounded">Retour</a>
+<style>
+    .min-h-screen {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    
+    .max-w-3xl {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(30, 58, 138, 0.15);
+        overflow: hidden;
+    }
+    
+    .text-3xl {
+        background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding: 1rem 0;
+        font-weight: 800;
+    }
+    
+    .flex.justify-center.mb-6 {
+        padding: 0 2rem;
+    }
+    
+    .rounded-lg.max-h-80 {
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.1);
+        border: 3px solid #f1f5f9;
+    }
+    
+    .text-gray-700 {
+        padding: 0 2rem;
+    }
+    
+    .text-gray-700 p {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 0.75rem;
+        border-left: 4px solid #1e3a8a;
+    }
+    
+    .text-gray-700 p strong {
+        color: #1e3a8a;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .text-sm.text-gray-600 {
+        display: inline-block;
+        margin: 0.5rem 1rem 0.5rem 0;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border-radius: 9999px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+    }
+    
+    .flex.justify-center.space-x-6 {
+        padding: 2rem;
+        background: #f8fafc;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 2rem;
+    }
+    
+    .bg-gray-600 {
+        background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+    }
+    
+    .bg-gray-600:hover {
+        background: linear-gradient(135deg, #4b5563, #374151) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+    
+    .bg-blue-600 {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+    }
+    
+    .bg-blue-600:hover {
+        background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    
+    .bg-red-600 {
+        background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+    }
+    
+    .bg-red-600:hover {
+        background: linear-gradient(135deg, #b91c1c, #dc2626) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    
+    .bg-gray-600, .bg-blue-600, .bg-red-600 {
+        border: none;
+        border-radius: 9999px !important;
+        padding: 0.75rem 2rem !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Animation subtile au survol de la carte */
+    .max-w-3xl {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .max-w-3xl:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px 0 rgba(30, 58, 138, 0.2);
+    }
+</style>
+
+<div class="min-h-screen bg-gray-50 py-10">
+    <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        <!-- Titre -->
+        <h2 class="text-3xl font-extrabold text-center text-blue-700 mb-6">
+            {{ article.title }}
+        </h2>
+
+        <!-- Image -->
+        <div class="flex justify-center mb-6">
+            {% if article.image %}
+                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="rounded-lg max-h-80 object-cover">
+            {% else %}
+                <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="rounded-lg max-h-80 object-cover">
+            {% endif %}
+        </div>
+
+        <!-- Détails -->
+        <div class="text-gray-700 text-lg leading-relaxed mb-8">
+            <p class="mb-2"><strong>Description :</strong> {{ article.description }}</p>
+            {% if article.content %}
+                <p class="mb-2"><strong>Contenu :</strong> {{ article.content }}</p>
+            {% endif %}
+            <p class="text-sm text-gray-600"><strong>Catégorie :</strong> {{ article.category }}</p>
+            <p class="text-sm text-gray-600"><strong>Publié :</strong> {{ article.published|yesno:"Oui,Non" }}</p>
+            <p class="text-sm text-gray-600"><strong>Créé le :</strong> {{ article.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <!-- Boutons visibles et centrés -->
+        <div class="flex justify-center space-x-6 mt-6">
+            <!-- Bouton Retour -->
+            <a href="{% url 'users:dashboard' %}" 
+               class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
+                ← Retour
+            </a>
+
+            <!-- Bouton Modifier -->
+            <a href="{% url 'blog:article_edit' article.id %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
+                ✏️ Modifier
+            </a>
+
+            <!-- Bouton Supprimer -->
+            <form action="{% url 'blog:article_delete' article.id %}" method="post" 
+                  onsubmit="return confirm('Es-tu sûr de vouloir supprimer cet article ?');">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
+                    🗑️ Supprimer
+                </button>
+            </form>
+        </div>
     </div>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const articleId = {{ id }};  // depuis la vue
+    const url = `/api/blog/api/articles/${articleId}/`; // endpoint API
+    try {
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            credentials: 'include'
+        });
+        if (!res.ok) throw new Error('Article non trouvé');
+        const data = await res.json();
+
+        // remplir le template
+        document.getElementById('article-title').innerText = data.title;
+        const imgEl = document.getElementById('article-image');
+        if(data.image) {
+            imgEl.src = data.image;
+            imgEl.alt = data.title;
+        } else {
+            imgEl.src = "{% static 'default_article_image.jpg' %}";
+            imgEl.alt = 'Image par défaut';
+        }
+        document.getElementById('article-description').innerText = data.description;
+        document.getElementById('article-content').innerText = data.content;
+        document.getElementById('article-category').innerText = `Catégorie : ${data.category}`;
+        document.getElementById('article-published').innerText = `Publié : ${data.published ? 'Oui' : 'Non'}`;
+        document.getElementById('article-created').innerText = `Créé le : ${new Date(data.created_at).toLocaleString()}`;
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('article-detail').classList.remove('hidden');
+    } catch(err) {
+        document.getElementById('loading').innerText = err.message;
+    }
+});
+</script>
 {% endblock %}

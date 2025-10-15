@@ -28,6 +28,9 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path('api/', include('blog_articles.users.urls')),
     path('api/blog/', include('blog_articles.blog.urls')),
+
+    path('blog/', include('blog.urls', namespace='blog')),
+    # autres apps ici
     path('api/contact/', include('blog_articles.contact.urls')),
 
     path(

@@ -1,18 +1,214 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
+<style>
+    /* Styles pour le carrousel */
+    .carousel {
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px 0 rgba(30, 58, 138, 0.15);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .carousel .flex {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-item {
+        min-width: 100%;
+        position: relative;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    /* Boutons de navigation */
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1rem;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+
+    .carousel-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 12px rgba(30, 58, 138, 0.2);
+    }
+
+    .carousel-btn:hover {
+        background: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(30, 58, 138, 0.3);
+    }
+
+    .carousel-btn svg {
+        width: 24px;
+        height: 24px;
+        color: #1e3a8a;
+    }
+
+    /* Indicateurs */
+    .carousel-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    .carousel-indicator {
+        width: 12px;
+        height: 12px;
+        /* border-radius: 50%; */
+        background: rgba(255, 255, 255, 0.6);
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-indicator.active {
+        background: white;
+        transform: scale(1.2);
+        border-color: #ff9256;
+    }
+
+    /* Légendes des articles */
+    .carousel-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(30, 58, 138, 0.9), transparent);
+        color: white;
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .carousel-caption h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .carousel-caption p {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+</style>
+
 <!-- Carousel Section -->
-<div class="carousel w-full mb-12 rounded-2xl overflow-hidden shadow-xl">
+<div class="carousel w-full mb-12">
     <div class="flex">
         {% for article in articles %}
             {% if article.image and article.published %}
                 <div class="carousel-item w-full">
                     <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-64 object-cover" />
+                    <div class="carousel-caption">
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.description|truncatewords:15 }}</p>
+                    </div>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
+    
+    <!-- Navigation -->
+    <div class="carousel-nav">
+        <button class="carousel-btn prev-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+        </button>
+        <button class="carousel-btn next-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Indicateurs -->
+    <div class="carousel-indicators">
+        {% for article in articles %}
+            {% if article.image and article.published %}
+                <button class="carousel-indicator {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></button>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('.carousel .flex');
+        const items = document.querySelectorAll('.carousel-item');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+        
+        let currentIndex = 0;
+        const totalItems = items.length;
+        
+        function updateCarousel() {
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            // Mettre à jour les indicateurs
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+            });
+        }
+        
+        // Navigation précédente
+        prevBtn.addEventListener('click', function() {
+            currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+            updateCarousel();
+        });
+        
+        // Navigation suivante
+        nextBtn.addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % totalItems;
+            updateCarousel();
+        });
+        
+        // Navigation par indicateurs
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', function() {
+                currentIndex = parseInt(this.getAttribute('data-index'));
+                updateCarousel();
+            });
+        });
+        
+        // Défilement automatique (optionnel)
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalItems;
+            updateCarousel();
+        }, 5000);
+    });
+</script>
+
+
+
 
 <!-- Hero Section -->
 <section class="hero-section relative flex flex-col items-center justify-center min-h-[60vh] mb-12">
@@ -27,11 +223,377 @@
     </div>
 </section>
 
+<style>
+   <style>
+    /* About Section */
+    .about-section {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 4rem 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(30, 58, 138, 0.1);
+        margin-bottom: 4rem;
+    }
+
+    .about-section h2 {
+        background: linear-gradient(120deg, #1e3a8a, #2563eb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+    }
+
+    .about-intro {
+        color: #64748b;
+        font-size: 1.4rem;
+        line-height: 1.7;
+        margin-bottom: 3rem;
+        font-weight: 500;
+        text-align: center;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .about-mission {
+        color: #475569;
+        font-size: 1.3rem;
+        line-height: 1.6;
+        margin-bottom: 3rem;
+        font-weight: 400;
+        text-align: center;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        font-style: italic;
+    }
+
+    .about-highlight {
+        background: linear-gradient(120deg, #ff9256, #f97316);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+
+    .about-values {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .value-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.1);
+        border: 2px solid #f1f5f9;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .value-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(30, 58, 138, 0.15);
+        border-color: #c7d2fe;
+    }
+
+    .value-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .value-title {
+        color: #1e3a8a;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        letter-spacing: -0.2px;
+    }
+
+    .value-description {
+        color: #64748b;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        border-radius: 1rem;
+        padding: 2rem 1.5rem;
+        min-width: 140px;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(30, 58, 138, 0.3);
+    }
+
+    .stat-value {
+        color: #ffffff;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    /* Articles Section */
+    .articles-section {
+        padding: 2rem 0;
+        margin-bottom: 4rem;
+    }
+
+    .articles-section h2 {
+        background: linear-gradient(120deg, #1e3a8a, #2563eb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 3rem;
+    }
+
+    .article-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #f1f5f9;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(30, 58, 138, 0.2);
+        border-color: #e2e8f0;
+    }
+
+    .article-card img {
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-title {
+        color: #1e3a8a;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+
+    .article-desc {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .article-link {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+    }
+
+    .article-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+    }
+
+    .text-sm.text-gray-500 {
+        color: #94a3b8 !important;
+        font-weight: 500;
+    }
+
+    /* Comments Section */
+    .comments-section {
+        padding: 2rem 0;
+        margin-bottom: 4rem;
+    }
+
+    .comments-section h2 {
+        background: linear-gradient(120deg, #1e3a8a, #2563eb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 3rem;
+    }
+
+    .comment-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.1);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .comment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 25px rgba(30, 58, 138, 0.15);
+    }
+
+    .comment-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .comment-content {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .comment-meta {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .comment-meta .font-semibold {
+        color: #1e3a8a;
+        font-weight: 600;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .about-section {
+            padding: 2rem 1rem;
+        }
+        
+        .about-section h2,
+        .articles-section h2,
+        .comments-section h2 {
+            font-size: 2rem;
+        }
+        
+        .about-intro,
+        .about-mission {
+            font-size: 1.1rem;
+        }
+        
+        .about-values {
+            grid-template-columns: 1fr;
+        }
+        
+        .stat-card {
+            min-width: 120px;
+            padding: 1.5rem 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+        
+        .comment-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .comment-card img {
+            align-self: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .flex.flex-wrap.justify-center.gap-8 {
+            gap: 1rem;
+        }
+        
+        .stat-card {
+            min-width: 100px;
+            padding: 1rem 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
 <!-- About Section -->
-<section id="about" class="about-section max-w-4xl mx-auto mb-16">
+<section id="about" class="about-section max-w-6xl mx-auto mb-16">
     <div class="text-center">
         <h2 class="text-3xl font-bold text-primary mb-2">À propos de nous</h2>
-        <p class="text-gray-600 mb-6">Bienvenue sur BlogApp, une plateforme moderne pour partager vos idées et découvertes.</p>
+        
+        <p class="about-intro">
+            <span class="about-highlight">Bienvenue sur BlogApp</span>, la plateforme où la passion de l'écriture rencontre l'innovation technologique. 
+            Nous créons un espace unique où chaque voix compte et où chaque histoire mérite d'être partagée.
+        </p>
+
+        <p class="about-mission">
+            "Notre mission est de démocratiser l'écriture en ligne en offrant une expérience 
+            <span class="about-highlight">intuitive, engageante et inspirante</span> à tous les amoureux des mots, 
+            des blogueurs occasionnels aux écrivains passionnés."
+        </p>
+
+        <div class="about-values">
+            <div class="value-card">
+                <div class="value-icon">🌟</div>
+                <h3 class="value-title">Excellence</h3>
+                <p class="value-description">
+                    Nous nous engageons à offrir une plateforme de qualité supérieure 
+                    avec des fonctionnalités innovantes et une interface utilisateur exceptionnelle.
+                </p>
+            </div>
+            
+            <div class="value-card">
+                <div class="value-icon">🤝</div>
+                <h3 class="value-title">Communauté</h3>
+                <p class="value-description">
+                    Nous cultivons un environnement bienveillant où les membres 
+                    peuvent échanger, collaborer et grandir ensemble autour de passions communes.
+                </p>
+            </div>
+            
+            <div class="value-card">
+                <div class="value-icon">💡</div>
+                <h3 class="value-title">Innovation</h3>
+                <p class="value-description">
+                    Nous repoussons constamment les limites de la création de contenu 
+                    en ligne avec des outils modernes et des fonctionnalités avant-gardistes.
+                </p>
+            </div>
+        </div>
+
+        <p class="text-gray-600 mb-6 text-lg">
+            Découvrez notre communauté florissante en quelques chiffres :
+        </p>
+        
         <div class="flex flex-wrap justify-center gap-8 text-lg">
             <div class="stat-card">
                 <span class="stat-value block">{{ user_count }}</span>
@@ -52,29 +614,30 @@
         </div>
     </div>
 </section>
-
 <!-- Articles Section -->
 <section id="articles" class="articles-section max-w-6xl mx-auto mb-16">
-    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Articles</h2>
+    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Articles ({{ article_count }})</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for article in articles %}
             {% if article.published %}
-                <div class="article-card">
+                <div class="article-card" data-id="{{ article.id }}">
                     {% if article.image %}
-                        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover mb-4">
+                        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover rounded mb-4">
+                    {% else %}
+                        <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="w-full h-48 object-cover rounded mb-4">
                     {% endif %}
-                    <h3 class="article-title mb-2">{{ article.title }}</h3>
-                    <p class="article-desc flex-1 mb-2">{{ article.description|truncatewords:30 }}</p>
+                    <h3 class="article-title text-xl font-semibold mb-2">{{ article.title }}</h3>
+                    <p class="article-desc muted flex-1 mb-2">{{ article.description|truncatewords:30 }}</p>
+                    <p class="text-sm muted">Par {{ article.author.username }} • Créé le : {{ article.created_at|date:"d/m/Y H:i" }}</p>
                     <div class="flex items-center justify-between mt-2">
-                        <span class="text-sm text-gray-500">Par {{ article.author.username }}</span>
-                        <a href="#" class="article-link">Lire plus</a>
+                        <span class="text-sm text-gray-500">Publié : {{ article.published|yesno:"Oui,Non" }}</span>
+                        <a href="{% url 'blog:article_detail' article.id %}" class="btn-primary">Lire plus</a>
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
 </section>
-
 <!-- Comments Section -->
 <section id="comments" class="comments-section max-w-4xl mx-auto mb-16">
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Commentaires</h2>
