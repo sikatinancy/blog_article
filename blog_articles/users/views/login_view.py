@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout
+from django.views import View
+from django.shortcuts import redirect
 from users.api.serializers import CustomTokenObtainPairSerializer
 
 class LoginAPIView(APIView):
@@ -32,3 +35,10 @@ class LoginAPIView(APIView):
 
 class LoginPageView(TemplateView):
     template_name = 'users/login.html'
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('users:home')
+
+

@@ -28,10 +28,16 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 
 # DATABASES
 # ------------------------------------------------------------------------------
-DATABASES = {"default": env.db("DATABASE_URL", default='postgres://melissa:1234@localhost:5432/articles2')}
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
+# DATABASES = {"default": env.db("DATABASE_URL", default='postgres://melissa:1234@localhost:5432/articles2')}
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+DATABASES = {
+    "default": env.db(
+        "DATABASE_URL",
+        default="postgresql://melissa_user:748ay83dpwdITfLDVmULqqfyKynNc7YP@dpg-d3qucq8dl3ps73c87ic0-a.oregon-postgres.render.com/melissa"
+    )
+}
 # URLS
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"

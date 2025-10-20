@@ -1,32 +1,123 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-bold text-primary mb-4">Inscription</h2>
-    {% if error %}
-        <p class="text-red-500">{{ error }}</p>
-    {% endif %}
-    
-    <form id="registerForm">
-        {% csrf_token %}
-        <div class="mb-4">
-            <label class="block text-gray-700">Nom d'utilisateur</label>
-            <input type="text" name="username" class="w-full p-2 border rounded" required>
-        </div>
-        <div class="mb-4">
-            <label class="block text-gray-700">Email</label>
-            <input type="email" name="email" class="w-full p-2 border rounded" required>
-        </div>
-        <div class="mb-4">
-            <label class="block text-gray-700">Mot de passe</label>
-            <input type="password" name="password" class="w-full p-2 border rounded" required>
-        </div>
-        <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700 text-secondary">
-            S'inscrire
-        </button>
-    </form>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <!-- Carte principale -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <!-- En-tête avec dégradé comme la navbar -->
+            <div class="bg-gradient-to-r from-primary to-accent py-6 px-8">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-white">Créer un compte</h1>
+                </div>
+                <p class="text-white/80 text-center text-sm">Rejoignez notre communauté BlogApp</p>
+            </div>
 
-    <p id="registerMessage" class="mt-4 text-center text-sm"></p>
+            <!-- Contenu du formulaire -->
+            <div class="py-8 px-8">
+                {% if error %}
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-red-600 text-sm">{{ error }}</p>
+                    </div>
+                {% endif %}
+                
+                <form id="registerForm" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Champ Nom d'utilisateur -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom d'utilisateur</label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                name="username" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 placeholder-gray-400"
+                                placeholder="Votre nom d'utilisateur"
+                                required
+                            >
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Champ Email -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Adresse email</label>
+                        <div class="relative">
+                            <input 
+                                type="email" 
+                                name="email" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 placeholder-gray-400"
+                                placeholder="votre@email.com"
+                                required
+                            >
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Champ Mot de passe -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                name="password" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 placeholder-gray-400"
+                                placeholder="Votre mot de passe"
+                                required
+                            >
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton d'inscription -->
+                    <button 
+                        type="submit" 
+                        class="w-full bg-gradient-to-r from-primary to-accent text-white py-3 px-4 rounded-lg font-semibold hover:from-primary/90 hover:to-accent/90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+                    >
+                        Créer mon compte
+                    </button>
+                </form>
+
+                <!-- Message de résultat -->
+                <p id="registerMessage" class="mt-6 text-center text-sm font-medium"></p>
+
+                <!-- Lien vers la connexion -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <p class="text-center text-gray-600 text-sm">
+                        Déjà un compte ? 
+                        <a href="{% url 'users:login' %}" class="text-primary font-semibold hover:text-accent transition-colors duration-200 ml-1">
+                            Se connecter
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations supplémentaires -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-500 text-xs">
+                En vous inscrivant, vous acceptez nos 
+                <a href="#" class="text-primary hover:text-accent transition-colors duration-200">Conditions d'utilisation</a> 
+                et notre 
+                <a href="#" class="text-primary hover:text-accent transition-colors duration-200">Politique de confidentialité</a>
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -34,33 +125,77 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     e.preventDefault();
 
     const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // État de chargement
+    submitButton.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Création du compte...
+    `;
+    submitButton.disabled = true;
+
     const data = {
         username: form.username.value,
         email: form.email.value,
         password: form.password.value,
     };
 
-    const response = await fetch("{% url 'users:register' %}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
-        },
-        body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
     const messageEl = document.getElementById("registerMessage");
 
-    if (response.ok) {
-        messageEl.innerText = "✅ Inscription réussie ! Vous pouvez maintenant vous connecter.";
-        messageEl.classList.remove("text-red-500");
-        messageEl.classList.add("text-green-600");
-        form.reset();
-    } else {
-        messageEl.innerText = "❌ Erreur : " + (result.detail || JSON.stringify(result));
-        messageEl.classList.remove("text-green-600");
-        messageEl.classList.add("text-red-500");
+    try {
+        const response = await fetch("{% url 'users:register' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            messageEl.innerHTML = `
+                <div class="flex items-center justify-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-medium">Inscription réussie ! Redirection...</span>
+                </div>
+            `;
+            form.reset();
+            
+            // Redirection après succès
+            setTimeout(() => {
+                window.location.href = "{% url 'users:login' %}";
+            }, 2000);
+        } else {
+            messageEl.innerHTML = `
+                <div class="flex items-center justify-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-medium">${result.detail || 'Une erreur est survenue'}</span>
+                </div>
+            `;
+        }
+    } catch (error) {
+        messageEl.innerHTML = `
+            <div class="flex items-center justify-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">Erreur de connexion</span>
+            </div>
+        `;
+    } finally {
+        // Restaurer le bouton
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
     }
 });
 </script>

@@ -11,8 +11,13 @@
     <!-- Articles Section -->
 <section id="articles" class="articles-section max-w-6xl mx-auto mb-16">
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Mes articles ({{ article_count }})</h2>
+
+      {% if user.is_authenticated %}
+            <a href="{% url 'users:logout' %}" class="btn-danger">Déconnexion</a>
+        {% endif %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for article in articles %}
+
         <div class="article-card" data-id="{{ article.id }}">
             <h3 class="article-title text-xl font-semibold mb-2">{{ article.title }}</h3>
             {% if article.image %}

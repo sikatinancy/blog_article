@@ -1,76 +1,226 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg mt-8">
-  <h2 class="text-2xl font-bold text-primary mb-4">Connexion</h2>
-  <p id="error-message" class="text-red-500 mb-4 hidden"></p>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <!-- Carte principale -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <!-- En-tête avec dégradé comme la navbar -->
+            <div class="bg-gradient-to-r from-primary to-accent py-6 px-8">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-white">Connexion</h1>
+                </div>
+                <p class="text-white/80 text-center text-sm">Accédez à votre espace BlogApp</p>
+            </div>
 
-  <form id="login-form">
-    {% csrf_token %}
-    <div class="mb-4">
-      <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-      <input type="text" id="username" name="username" class="mt-1 block w-full p-2 border rounded" required>
-    </div>
-    <div class="mb-4">
-      <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
-      <input type="password" id="password" name="password" class="mt-1 block w-full p-2 border rounded" required>
-    </div>
-    <button type="submit" class="bg-accent text-white p-2 rounded w-full hover:bg-accent-dark transition">Se connecter</button>
-  </form>
+            <!-- Contenu du formulaire -->
+            <div class="py-8 px-8">
+                <!-- Message d'erreur -->
+                <div id="error-message" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-center gap-2 text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-medium text-sm" id="error-text"></span>
+                    </div>
+                </div>
 
-  <p class="mt-4 text-center">
-    Pas de compte ?
-    <a href="{% url 'users:register' %}" class="text-accent hover:underline">S'inscrire</a>
-  </p>
+                <form id="login-form" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Champ Nom d'utilisateur -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom d'utilisateur</label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 placeholder-gray-400"
+                                placeholder="Votre nom d'utilisateur"
+                                required
+                            >
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Champ Mot de passe -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 placeholder-gray-400"
+                                placeholder="Votre mot de passe"
+                                required
+                            >
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options supplémentaires -->
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="ml-2 text-sm text-gray-600">Se souvenir de moi</span>
+                        </label>
+                        <a href="#" class="text-sm text-primary hover:text-accent transition-colors duration-200">
+                            Mot de passe oublié ?
+                        </a>
+                    </div>
+
+                    <!-- Bouton de connexion -->
+                    <button 
+                        type="submit" 
+                        id="login-button"
+                        class="w-full bg-gradient-to-r from-primary to-accent text-white py-3 px-4 rounded-lg font-semibold hover:from-primary/90 hover:to-accent/90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+                    >
+                        Se connecter
+                    </button>
+                </form>
+
+                <!-- Lien vers l'inscription -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <p class="text-center text-gray-600 text-sm">
+                        Pas encore de compte ? 
+                        <a href="{% url 'users:register' %}" class="text-primary font-semibold hover:text-accent transition-colors duration-200 ml-1">
+                            Créer un compte
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations supplémentaires -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-500 text-xs">
+                En vous connectant, vous acceptez nos 
+                <a href="#" class="text-primary hover:text-accent transition-colors duration-200">Conditions d'utilisation</a> 
+                et notre 
+                <a href="#" class="text-primary hover:text-accent transition-colors duration-200">Politique de confidentialité</a>
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('login-form');
-  const errorMessage = document.getElementById('error-message');
-  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const form = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const loginButton = document.getElementById('login-button');
+    const originalButtonText = loginButton.innerHTML;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    errorMessage.classList.add('hidden');
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Masquer les erreurs précédentes
+        errorMessage.classList.add('hidden');
 
-    const username = form.username.value;
-    const password = form.password.value;
+        const username = form.username.value;
+        const password = form.password.value;
 
-    try {
-      const response = await fetch("{% url 'users:api-login' %}", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({ username, password })
-      });
+        // État de chargement
+        loginButton.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Connexion en cours...
+        `;
+        loginButton.disabled = true;
 
-      const data = await response.json();
+        try {
+            const response = await fetch("{% url 'users:api-login' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ username, password })
+            });
 
-      if (response.ok) {
-        // Stocker les tokens JWT
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
+            const data = await response.json();
 
-        // Redirection selon le rôle
-        if (data.is_superuser) {
-          window.location.href = "{% url 'users:admin_dashboard' %}";
-        } else {
-          window.location.href = "{% url 'users:dashboard' %}";
+            if (response.ok) {
+                // Stocker les tokens JWT
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
+
+                // Message de succès
+                loginButton.innerHTML = `
+                    <svg class="animate-bounce h-5 w-5 text-white inline mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Connexion réussie !
+                `;
+
+                // Redirection selon le rôle après un court délai
+                setTimeout(() => {
+                    if (data.is_superuser) {
+                        window.location.href = "{% url 'users:admin_dashboard' %}";
+                    } else {
+                        window.location.href = "{% url 'users:dashboard' %}";
+                    }
+                }, 1000);
+
+            } else {
+                // Afficher l'erreur
+                errorText.textContent = data.error || 'Identifiants incorrects.';
+                errorMessage.classList.remove('hidden');
+                
+                // Restaurer le bouton
+                loginButton.innerHTML = originalButtonText;
+                loginButton.disabled = false;
+            }
+
+        } catch (err) {
+            errorText.textContent = 'Erreur de connexion au serveur.';
+            errorMessage.classList.remove('hidden');
+            
+            // Restaurer le bouton
+            loginButton.innerHTML = originalButtonText;
+            loginButton.disabled = false;
         }
+    });
 
-      } else {
-        errorMessage.textContent = data.error || 'Identifiants incorrects.';
-        errorMessage.classList.remove('hidden');
-      }
-
-    } catch (err) {
-      errorMessage.textContent = 'Erreur de connexion au serveur.';
-      errorMessage.classList.remove('hidden');
-    }
-  });
+    // Animation d'entrée des champs
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach((input, index) => {
+        input.style.animationDelay = `${index * 0.1}s`;
+        input.classList.add('animate-fade-in-up');
+    });
 });
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+}
+</style>
 {% endblock %}
