@@ -5,11 +5,18 @@ from .base import INSTALLED_APPS
 from .base import REDIS_URL
 from .base import SPECTACULAR_SETTINGS
 from .base import env
+import dj_database_url
+
+
+
+DATABASES = {
+    'default': dj_database_url.config(default='postgresql://melissa_user:748ay83dpwdITfLDVmULqqfyKynNc7YP@dpg-d3qucq8dl3ps73c87ic0-a.oregon-postgres.render.com/melissa')
+}
 
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = env("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '0oYSr5ocR66AT1rMACZ8XgAMWoPWpLMCXKG3uIUJDy57kHpFz40A3Ms2xTiiNXOR')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["Nancy.com"])
 
