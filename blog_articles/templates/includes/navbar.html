@@ -21,7 +21,7 @@
 
 
 </style>
-<nav class="bg-gradient-to-r from-primary to-accent text-white shadow-md py-3">
+<nav class="text-white shadow-md py-3">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
     
     <div class="flex items-center gap-4">
@@ -51,7 +51,7 @@
 
         <!-- Liens Dashboard/Admin si connecté -->
         {% if user.is_authenticated %}
-          <a href="{% url 'users:dashboard' %}" class="px-4 py-2 rounded-lg bg-white text-secondary font-semibold hover:bg-gray-100 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200">Mon Dashboard</a>
+          <a href="{% url 'users:dashboard' %}" class="px-4 py-2 rounded-lg bg-white text-primary font-semibold hover:bg-gray-100 transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200">Mon Dashboard</a>
           {% if user.is_superuser %}
             <a href="{% url 'users:admin_dashboard' %}" class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition-all duration-200 shadow-sm hover:shadow-md border border-yellow-600">Admin</a>
           {% endif %}
@@ -61,7 +61,7 @@
 
     <!-- Bouton Menu Mobile -->
     <div class="md:hidden">
-      <button id="mobile-menu-button" class="p-3 rounded-lg bg-white text-primary shadow-sm hover:shadow-md transition-all duration-200">
+      <button id="mobile-menu-button" class="p-3 rounded-lg bg-black text-primary shadow-sm hover:shadow-md transition-all duration-200">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
@@ -71,7 +71,7 @@
   </div>
 
   <!-- Menu Mobile - Amélioré -->
-  <div id="mobile-menu" class="hidden md:hidden bg-white text-primary shadow-lg">
+  <div id="mobile-menu" class="hidden md:hidden text-blueshadow-lg">
     <div class="px-4 py-2 space-y-1">
       <a href="{% url 'users:home' %}" class="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium border-l-4 border-primary">Accueil</a>
       <a href="#articles" class="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium border-l-4 border-primary">Articles</a>
