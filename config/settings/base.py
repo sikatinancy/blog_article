@@ -33,12 +33,24 @@ SECRET_KEY="0oYSr5ocR66AT1rMACZ8XgAMWoPWpLMCXKG3uIUJDy57kHpFz40A3Ms2xTiiNXOR"
 # DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-DATABASES = {
-    "default": env.db(
-        "DATABASE_URL",
-        default="postgresql://melissa_user:748ay83dpwdITfLDVmULqqfyKynNc7YP@dpg-d3qucq8dl3ps73c87ic0-a.oregon-postgres.render.com/melissa"
-    )
-}
+if DEBUG:
+    DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': env.db("DB_NAME", default="nitypulse_db"),
+                'USER': env.db("DB_USER", default="postgres"),
+                'PASSWORD': env.db("DB_PASSWORD", default="postgres"),
+                'HOST': env.db("DB_HOST", default="127.0.0.1"),
+                'PORT': env.db("DB_PORT", default="5432"),
+            }
+        }
+else:
+    DATABASES = {
+        "default": env.db(
+            "DATABASE_URL",
+             default="postgresql://melissa_user:748ay83dpwdITfLDVmULqqfyKynNc7YP@dpg-d3qucq8dl3ps73c87ic0-a.oregon-postgres.render.com/melissa"
+        )
+    }
 # URLS
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"

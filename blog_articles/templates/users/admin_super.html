@@ -472,6 +472,10 @@
                     <i class="fas fa-crown"></i>
                     Super Admin
                 </h2>
+
+                   <button class="close-sidebar" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
             <div class="nav-section">
@@ -574,7 +578,8 @@
                 </div>
             </div>
 
-            <!-- Users Section -->
+            
+            <!-- Users Section - NOUVEAU FORMAT -->
             <section id="users" class="content-section">
                 <div class="section-header">
                     <h2>
@@ -587,7 +592,24 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">{{ user.username }}</h3>
-                            <p class="card-description">{{ user.email }}</p>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ user.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nom complet:</span>
+                                <span class="info-value">{{ user.first_name }} {{ user.last_name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Statut:</span>
+                                <span class="info-value">{% if user.is_active %}Actif{% else %}Inactif{% endif %}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Staff:</span>
+                                <span class="info-value">{% if user.is_staff %}Oui{% else %}Non{% endif %}</span>
+                            </div>
                         </div>
                         <div class="card-meta">
                             Membre depuis {{ user.date_joined|date:"d/m/Y" }}
@@ -610,7 +632,7 @@
                 </div>
             </section>
 
-            <!-- Articles Section -->
+            <!-- Articles Section - NOUVEAU FORMAT -->
             <section id="articles" class="content-section">
                 <div class="section-header">
                     <h2>
@@ -623,10 +645,27 @@
                     <div class="card" data-id="{{ article.id }}">
                         <div class="card-header">
                             <h3 class="card-title">{{ article.title }}</h3>
-                            <p class="card-description">{{ article.description|truncatewords:30 }}</p>
                         </div>
-                        <div class="card-meta">
-                            Par {{ article.author.username }} • {{ article.created_at|date:"d/m/Y" }}
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Auteur:</span>
+                                <span class="info-value">{{ article.author.username }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Catégorie:</span>
+                                <span class="info-value">{{ article.category|default:"Non catégorisé" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Statut:</span>
+                                <span class="info-value">{% if article.published %}Publié{% else %}Brouillon{% endif %}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Date:</span>
+                                <span class="info-value">{{ article.created_at|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            {{ article.description|truncatewords:30 }}
                         </div>
                         <div class="card-actions">
                             <a href="{% url 'blog:article_detail' article.id %}" class="btn btn-view">
@@ -650,7 +689,6 @@
                     {% endfor %}
                 </div>
             </section>
-
             <!-- Comments Section -->
             <section id="comments" class="content-section">
                 <div class="section-header">
