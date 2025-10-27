@@ -33,7 +33,7 @@ jsonschema==4.25.1
 jsonschema-specifications==2025.9.1
 kombu==5.5.4
 packaging==25.0
-pillow==11.3.0
+pillow==12.0.0
 pluggy==1.6.0
 gunicorn
 prompt_toolkit==3.0.52
