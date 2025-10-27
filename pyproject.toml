@@ -185,6 +185,6 @@ dependencies = [
     "pillow==11.3.0",
     "psycopg[c]==3.2.10",
     "python-slugify==8.0.4",
-    "redis==6.4.0",
+    "redis==7.0.1",
     "whitenoise==6.11.0",
 ]
