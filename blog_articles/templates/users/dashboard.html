@@ -1,268 +1,309 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="dashboard-container">
-    <h2 class="dashboard-header">Tableau de bord</h2>
-    <div class="mb-8 flex gap-3">
-        <button type="button" onclick="document.getElementById('create-article-modal').classList.remove('hidden')" class="btn-accent">Créer un article</button>
-        <button type="button" onclick="document.getElementById('create-comment-modal').classList.remove('hidden')" class="btn-accent">Écrire un commentaire</button>
-    </div>
-
-    <!-- Articles Section -->
-<section id="articles" class="articles-section max-w-6xl mx-auto mb-16">
-    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Mes articles ({{ article_count }})</h2>
-
-      {% if user.is_authenticated %}
-            <a href="{% url 'users:logout' %}" class="btn-danger">Déconnexion</a>
-        {% endif %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for article in articles %}
-
-        <div class="article-card" data-id="{{ article.id }}">
-            <h3 class="article-title text-xl font-semibold mb-2">{{ article.title }}</h3>
-            {% if article.image %}
-                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover rounded mb-4">
-            {% else %}
-                <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="w-full h-48 object-cover rounded mb-4">
-            {% endif %}
-            <p class="article-desc muted flex-1 mb-2">{{ article.description|truncatewords:30 }}</p>
-            <p class="text-sm muted">Publié : {{ article.published|yesno:"Oui,Non" }}</p>
-            <p class="text-sm muted">Créé le : {{ article.created_at|date:"d/m/Y H:i" }}</p>
-            <div class="mt-4 flex gap-2">
-                <a href="{% url 'blog:article_detail' article.id %}" class="btn-primary">Voir</a>
-                <button type="button" class="btn-accent edit-article-btn"
-                        data-id="{{ article.id }}"
-                        data-title="{{ article.title|escape }}"
-                        data-description="{{ article.description|escape }}"
-                        data-content="{{ article.content|escape }}"
-                        data-category="{{ article.category|default_if_none:''|escape }}"
-                        data-published="{{ article.published|yesno:'true,false' }}"
-                        data-image="{% if article.image %}{{ article.image.url|escape }}{% else %}''{% endif %}">Modifier</button>
-                <button type="button" class="btn-danger delete-btn" data-id="{{ article.id }}" data-type="article">Supprimer</button>
+<!-- === SECTION PROFIL UTILISATEUR === -->
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-12">
+            <div class="flex items-center gap-6 mb-8">
+                <!-- Photo ronde -->
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-24 h-24 rounded-full object-cover border-4 border-primary shadow-md">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                        {{ user.username.0|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Bienvenue, {{ user.username }} !</h1>
+                    <p class="text-gray-600">{{ user.email }}</p>
+                </div>
             </div>
-        </div>
-        {% endfor %}
-    </div>
-</section>
-    <!-- COMMENTAIRES -->
-    <h3 class="text-xl font-semibold text-primary mb-4">Mes commentaires ({{ comment_count }})</h3>
-    <div class="space-y-4">
-        {% for comment in comments %}
-        <div class="dashboard-card" data-id="{{ comment.id }}">
-            <p class="muted">{{ comment.content }}</p>
-            <p class="text-sm muted">Sur {{ comment.article.title }}</p>
-            <p class="text-sm muted">Publié : {{ comment.published|yesno:"Oui,Non" }}</p>
-            <p class="text-sm muted">Créé le : {{ comment.created_at|date:"d/m/Y H:i" }}</p>
-            <div class="mt-3 flex gap-2">
-                <a href="{% url 'blog:comment_detail' comment.id %}" class="btn-primary">Voir</a>
-                <button type="button" class="btn-accent edit-comment-btn"
-                        data-id="{{ comment.id }}"
-                        data-content="{{ comment.content|escape }}"
-                        data-article-id="{{ comment.article.id }}"
-                        data-published="{{ comment.published|yesno:'true,false' }}">Modifier</button>
-                <button type="button" class="btn-danger delete-btn" data-id="{{ comment.id }}" data-type="comment">Supprimer</button>
+
+            <!-- Boutons d'action -->
+            <div class="mb-8 flex gap-3">
+                <button type="button" onclick="document.getElementById('create-article-modal').classList.remove('hidden')" class="btn-accent">Créer un article</button>
+                <button type="button" onclick="document.getElementById('create-comment-modal').classList.remove('hidden')" class="btn-accent">Écrire un commentaire</button>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:logout' %}" class="btn-danger ml-auto">Déconnexion</a>
+                {% endif %}
             </div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- MODAL CREER ARTICLE -->
-    <div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Créer un article</h3>
-            <form method="post" id="create-article-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
-                    <input type="text" name="title" id="title" class="form-control" required>
+            <!-- Statistiques rapides -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="font-semibold text-lg mb-2">Mes articles</h3>
+                    <p class="text-gray-600">{{ article_count }} article{{ article_count|pluralize }}</p>
                 </div>
-                <div class="mb-4">
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" id="description" class="form-control" required></textarea>
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="font-semibold text-lg mb-2">Statistiques</h3>
+                    <p class="text-gray-600">{{ comment_count }} commentaire{{ comment_count|pluralize }}</p>
                 </div>
-                <div class="mb-4">
-                    <label for="content" class="block text-sm font-medium text-gray-700">Contenu</label>
-                    <textarea name="content" id="content" class="form-control" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</label>
-                    <input type="text" name="category" id="category" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
-                    <input type="file" name="image" id="image" class="form-control" accept="image/*">
-                </div>
-                <div class="mb-4">
-                    <label for="published" class="block text-sm font-medium text-gray-700">Publié</label>
-                    <input type="checkbox" name="published" id="published" class="form-control">
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('create-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Créer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL EDIT ARTICLE -->
-    <div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
-            <form method="post" id="edit-article-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="edit-article-id">
-                <div class="mb-4">
-                    <label for="edit-title" class="block text-sm font-medium text-gray-700">Titre</label>
-                    <input type="text" name="title" id="edit-title" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-description" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" id="edit-description" class="form-control" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-content" class="block text-sm font-medium text-gray-700">Contenu</label>
-                    <textarea name="content" id="edit-content" class="form-control" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-category" class="block text-sm font-medium text-gray-700">Catégorie</label>
-                    <input type="text" name="category" id="edit-category" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-image" class="block text-sm font-medium text-gray-700">Image</label>
-                    <input type="file" name="image" id="edit-image" class="form-control" accept="image/*">
-                    <p id="current-image" class="text-sm muted"></p>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-published" class="block text-sm font-medium text-gray-700">Publié</label>
-                    <input type="checkbox" name="published" id="edit-published" class="form-control">
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('edit-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Modifier</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL DELETE ARTICLE -->
-    <div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Supprimer l'article</h3>
-            <p>Êtes-vous sûr de vouloir supprimer cet article ?</p>
-            <form method="post" id="delete-article-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="delete-article-id">
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('delete-article-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-danger">Supprimer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODALS COMMENTAIRES (CRÉER, EDIT, DELETE) -->
-    <div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
-            <form method="post" id="create-comment-form">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label for="content" class="block text-sm font-medium text-gray-700">Contenu</label>
-                    <textarea name="content" id="content" class="form-control"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="article" class="block text-sm font-medium text-gray-700">Article</label>
-                    <select name="article" id="article" class="form-control">
-                        {% for article in articles %}
-                        <option value="{{ article.id }}">{{ article.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="published" class="block text-sm font-medium text-gray-700">Publié</label>
-                    <input type="checkbox" name="published" id="published" class="form-control">
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('create-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Créer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
-            <form method="post" id="edit-comment-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="edit-comment-id">
-                <div class="mb-4">
-                    <label for="edit-content" class="block text-sm font-medium text-gray-700">Contenu</label>
-                    <textarea name="content" id="edit-content" class="form-control"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-article" class="block text-sm font-medium text-gray-700">Article</label>
-                    <select name="article" id="edit-article" class="form-control">
-                        {% for article in articles %}
-                        <option value="{{ article.id }}">{{ article.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-published" class="block text-sm font-medium text-gray-700">Publié</label>
-                    <input type="checkbox" name="published" id="edit-published" class="form-control">
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('edit-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Modifier</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Supprimer le commentaire</h3>
-            <p>Êtes-vous sûr de vouloir supprimer ce commentaire ?</p>
-            <form method="post" id="delete-comment-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="delete-comment-id">
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('delete-comment-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-danger">Supprimer</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- === SECTION ARTICLES === -->
+<section id="articles" class="articles-section max-w-6xl mx-auto mb-16 px-4">
+    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Mes articles ({{ article_count }})</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for article in articles %}
+        <div class="article-card bg-white rounded-xl shadow-md overflow-hidden" data-id="{{ article.id }}">
+            {% if article.image %}
+                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover">
+            {% else %}
+                <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="w-full h-48 object-cover">
+            {% endif %}
+            <div class="p-6">
+                <h3 class="article-title text-xl font-semibold mb-2">{{ article.title }}</h3>
+                <p class="article-desc text-gray-600 mb-2 line-clamp-2">{{ article.description|truncatewords:20 }}</p>
+                <p class="text-sm text-gray-500">Publié : {{ article.published|yesno:"Oui,Non" }}</p>
+                <p class="text-sm text-gray-500">Créé le : {{ article.created_at|date:"d/m/Y H:i" }}</p>
+                <div class="mt-4 flex gap-2">
+                    <a href="{% url 'blogs:article_detail' article.id %}" class="btn-primary">Voir</a>
+                    <button type="button" class="btn-accent edit-article-btn"
+                            data-id="{{ article.id }}"
+                            data-title="{{ article.title|escape }}"
+                            data-description="{{ article.description|escape }}"
+                            data-content="{{ article.content|escape }}"
+                            data-category="{{ article.category|default_if_none:''|escape }}"
+                            data-published="{{ article.published|yesno:'true,false' }}"
+                            data-image="{% if article.image %}{{ article.image.url|escape }}{% else %}''{% endif %}">
+                        Modifier
+                    </button>
+                    <button type="button" class="btn-danger delete-btn" data-id="{{ article.id }}" data-type="article">Supprimer</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-500 col-span-full">Aucun article pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- === SECTION COMMENTAIRES === -->
+<section class="max-w-6xl mx-auto mb-16 px-4">
+    <h3 class="text-xl font-semibold text-primary mb-4">Mes commentaires ({{ comment_count }})</h3>
+    <div class="space-y-4">
+        {% for comment in comments %}
+        <div class="dashboard-card bg-white rounded-xl shadow-md p-6" data-id="{{ comment.id }}">
+            <p class="text-gray-700 mb-2">{{ comment.content }}</p>
+            <p class="text-sm text-gray-500">Sur : <strong>{{ comment.article.title }}</strong></p>
+            <p class="text-sm text-gray-500">Publié : {{ comment.published|yesno:"Oui,Non" }}</p>
+            <p class="text-sm text-gray-500">Créé le : {{ comment.created_at|date:"d/m/Y H:i" }}</p>
+            <div class="mt-3 flex gap-2">
+                <a href="{% url 'blogs:comment_detail' comment.id %}" class="btn-primary">Voir</a>
+                <button type="button" class="btn-accent edit-comment-btn"
+                        data-id="{{ comment.id }}"
+                        data-content="{{ comment.content|escape }}"
+                        data-article-id="{{ comment.article.id }}"
+                        data-published="{{ comment.published|yesno:'true,false' }}">
+                    Modifier
+                </button>
+                <button type="button" class="btn-danger delete-btn" data-id="{{ comment.id }}" data-type="comment">Supprimer</button>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-500">Aucun commentaire pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- === MODALES (CRÉER, MODIFIER, SUPPRIMER) === -->
+<!-- MODAL CRÉER ARTICLE -->
+<div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold mb-4">Créer un article</h3>
+        <form method="post" id="create-article-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                <input type="text" name="title" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" class="form-control" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" class="form-control" rows="5" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                <input type="text" name="category" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <input type="file" name="image" accept="image/*" class="form-control">
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="published" class="h-4 w-4 text-primary">
+                <label for="published" class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-accent">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ÉDITER ARTICLE -->
+<div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
+        <form method="post" id="edit-article-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="edit-article-id">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                <input type="text" name="title" id="edit-title" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" id="edit-description" class="form-control" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" id="edit-content" class="form-control" rows="5" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                <input type="text" name="category" id="edit-category" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <input type="file" name="image" id="edit-image" accept="image/*" class="form-control">
+                <p id="current-image" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
+                <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-accent">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL SUPPRIMER ARTICLE -->
+<div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+        <h3 class="text-xl font-bold mb-4">Supprimer l'article ?</h3>
+        <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
+        <form method="post" id="delete-article-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="delete-article-id">
+            <div class="flex justify-center gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-danger">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL CRÉER COMMENTAIRE -->
+<div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
+        <form method="post" id="create-comment-form">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                <select name="article" class="form-control" required>
+                    {% for article in articles %}
+                    <option value="{{ article.id }}">{{ article.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" class="h-4 w-4 text-primary">
+                <label class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-accent">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ÉDITER COMMENTAIRE -->
+<div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
+        <form method="post" id="edit-comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="edit-comment-id">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" id="edit-content" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                <select name="article" id="edit-article" class="form-control" required>
+                    {% for article in articles %}
+                    <option value="{{ article.id }}">{{ article.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
+                <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-accent">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL SUPPRIMER COMMENTAIRE -->
+<div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+        <h3 class="text-xl font-bold mb-4">Supprimer le commentaire ?</h3>
+        <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
+        <form method="post" id="delete-comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="delete-comment-id">
+            <div class="flex justify-center gap-3">
+                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
+                <button type="submit" class="btn-danger">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- === SCRIPTS AJAX === -->
 <script>
 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-// ======== ARTICLES CRUD AJAX ========
-
-// CREATE ARTICLE
-document.getElementById('create-article-form').addEventListener('submit', async function(e){
+// === ARTICLES ===
+document.getElementById('create-article-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const data = new FormData(this);
     try {
-        const res = await fetch("{% url 'blog:article_create' %}", {
+        const res = await fetch("{% url 'blogs:article_create' %}", {
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken },
             body: data
         });
-        if (res.ok) {
-            location.reload();
-        } else {
-            const err = await res.text();
-            alert('Erreur création article : ' + err);
-        }
-    } catch (error) {
-        alert('Erreur réseau lors de la création');
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la création de l\'article.');
+    } catch (err) {
+        alert('Erreur réseau.');
     }
 });
 
-// OPEN EDIT MODAL
+// OUVRIR MODALE ÉDITION
 document.querySelectorAll('.edit-article-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.getElementById('edit-article-id').value = btn.dataset.id;
@@ -271,15 +312,15 @@ document.querySelectorAll('.edit-article-btn').forEach(btn => {
         document.getElementById('edit-content').value = btn.dataset.content;
         document.getElementById('edit-category').value = btn.dataset.category;
         document.getElementById('edit-published').checked = btn.dataset.published === 'true';
-        document.getElementById('current-image').innerText = btn.dataset.image 
-            ? `Image actuelle : ${btn.dataset.image}`
+        document.getElementById('current-image').innerHTML = btn.dataset.image
+            ? `<img src="${btn.dataset.image}" class="w-20 h-20 object-cover rounded mt-2">`
             : 'Aucune image';
         document.getElementById('edit-article-modal').classList.remove('hidden');
     });
 });
 
-// EDIT ARTICLE
-document.getElementById('edit-article-form').addEventListener('submit', async function(e){
+// MODIFIER ARTICLE
+document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const id = document.getElementById('edit-article-id').value;
     const data = new FormData(this);
@@ -289,29 +330,22 @@ document.getElementById('edit-article-form').addEventListener('submit', async fu
             headers: { 'X-CSRFToken': csrfToken },
             body: data
         });
-        if (res.ok) {
-            location.reload();
-        } else {
-            const err = await res.text();
-            alert('Erreur modification article : ' + err);
-        }
-    } catch (error) {
-        alert('Erreur réseau lors de la modification');
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la modification.');
+    } catch (err) {
+        alert('Erreur réseau.');
     }
 });
 
-// OPEN DELETE MODAL
-document.querySelectorAll('.delete-btn').forEach(btn => {
-    if (btn.dataset.type === 'article') {
-        btn.addEventListener('click', () => {
-            document.getElementById('delete-article-id').value = btn.dataset.id;
-            document.getElementById('delete-article-modal').classList.remove('hidden');
-        });
-    }
+// SUPPRIMER ARTICLE
+document.querySelectorAll('.delete-btn[data-type="article"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('delete-article-id').value = btn.dataset.id;
+        document.getElementById('delete-article-modal').classList.remove('hidden');
+    });
 });
 
-// DELETE ARTICLE
-document.getElementById('delete-article-form').addEventListener('submit', async function(e){
+document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const id = document.getElementById('delete-article-id').value;
     try {
@@ -319,59 +353,96 @@ document.getElementById('delete-article-form').addEventListener('submit', async 
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken }
         });
-        if (res.ok) {
-            location.reload();
-        } else {
-            const err = await res.text();
-            alert('Erreur suppression article : ' + err);
-        }
-    } catch (error) {
-        alert('Erreur réseau lors de la suppression');
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la suppression.');
+    } catch (err) {
+        alert('Erreur réseau.');
     }
 });
 
-
-
-
-// ======== COMMENTAIRES CRUD AJAX ========
-document.getElementById('create-comment-form').addEventListener('submit', async function(e){
+// === COMMENTAIRES ===
+document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const data = new FormData(this);
-    const res = await fetch("{% url 'blog:comment_create' %}", {method:'POST', headers:{'X-CSRFToken':csrfToken}, body:data});
-    if(res.ok) location.reload(); else alert('Erreur création commentaire');
+    try {
+        const res = await fetch("{% url 'blogs:comment_create' %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: data
+        });
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la création du commentaire.');
+    } catch (err) {
+        alert('Erreur réseau.');
+    }
 });
 
-document.querySelectorAll('.edit-comment-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
         document.getElementById('edit-comment-id').value = btn.dataset.id;
         document.getElementById('edit-content').value = btn.dataset.content;
         document.getElementById('edit-article').value = btn.dataset.articleId;
-        document.getElementById('edit-published').checked = btn.dataset.published==='true';
+        document.getElementById('edit-published').checked = btn.dataset.published === 'true';
         document.getElementById('edit-comment-modal').classList.remove('hidden');
     });
 });
 
-document.getElementById('edit-comment-form').addEventListener('submit', async function(e){
+document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const id = document.getElementById('edit-comment-id').value;
     const data = new FormData(this);
-    const res = await fetch(`/blog/comment/${id}/edit/`, {method:'POST', headers:{'X-CSRFToken':csrfToken}, body:data});
-    if(res.ok) location.reload(); else alert('Erreur modification commentaire');
-});
-
-document.querySelectorAll('.delete-btn').forEach(btn=>{
-    if(btn.dataset.type==='comment'){
-        btn.addEventListener('click', ()=>{
-            document.getElementById('delete-comment-id').value = btn.dataset.id;
-            document.getElementById('delete-comment-modal').classList.remove('hidden');
+    try {
+        const res = await fetch(`/blog/comment/${id}/edit/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: data
         });
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la modification du commentaire.');
+    } catch (err) {
+        alert('Erreur réseau.');
     }
 });
-document.getElementById('delete-comment-form').addEventListener('submit', async function(e){
+
+document.querySelectorAll('.delete-btn[data-type="comment"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('delete-comment-id').value = btn.dataset.id;
+        document.getElementById('delete-comment-modal').classList.remove('hidden');
+    });
+});
+
+document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const id = document.getElementById('delete-comment-id').value;
-    const res = await fetch(`/blog/comment/${id}/delete/`, {method:'POST', headers:{'X-CSRFToken':csrfToken}});
-    if(res.ok) location.reload(); else alert('Erreur suppression commentaire');
+    try {
+        const res = await fetch(`/blog/comment/${id}/delete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        });
+        if (res.ok) location.reload();
+        else alert('Erreur lors de la suppression du commentaire.');
+    } catch (err) {
+        alert('Erreur réseau.');
+    }
 });
 </script>
+
+<style>
+.modal-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+.modal-panel {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+</style>
 {% endblock %}

@@ -87,7 +87,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
       'blog_articles.blog',  # <-- ici, l'app contenant Article et Comment
     'blog_articles.users',
-    'blog_articles.contact', 
+    'blog_articles.contact',
+    'blog_articles.newsletter', 
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -106,7 +107,8 @@ ALLOWED_HOSTS = ["*"]
 # AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = 'users:login'
-
+# config/settings/local.py  (ou base.py si partagé)
+FRONTEND_URL = 'http://127.0.0.1:8000'  # ← À AJOUTER
 # PASSWORDS
 # ------------------------------------------------------------------------------
 PASSWORD_HASHERS = [
@@ -198,11 +200,13 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 X_FRAME_OPTIONS = "DENY"
 
-# EMAIL
-# ------------------------------------------------------------------------------
-EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
-EMAIL_TIMEOUT = 5
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Hôte SMTP pour Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER='fotsoeddysteve@gmail.com'
+EMAIL_HOST_PASSWORD='iwpq qosi aalq pywo'
+  # Mot de passe d'application Gmail
 # ADMIN
 # ------------------------------------------------------------------------------
 ADMIN_URL = "admin/"

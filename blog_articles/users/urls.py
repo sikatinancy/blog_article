@@ -7,17 +7,26 @@ from users.views.user_views import UserCreateView, UserEditView, UserDeleteView,
 from users.api.viewsets import UserListAPI
 from rest_framework_simplejwt.views import TokenRefreshView
 from users.views.login_view import LoginAPIView,LoginPageView, LogoutView
-from users.views.signup_view import SignupView
+from users.views.signup_view import SignupPageView, SignupAPIView,activate_account
 
 
 app_name = 'users'
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
+# Pages HTML
+    path('register/', SignupPageView.as_view(), name='register'),
     path('login/', LoginPageView.as_view(), name='login'),
-    path('api/login/', LoginAPIView.as_view(), name='api-login'),
+
+    # API
+    path('api/register/', SignupAPIView.as_view(), name='register_api'),
+    path('api/login/', LoginAPIView.as_view(), name='api-login'),  # → /users/api/login/
+
+    # Activation
+    path('activate/<str:uidb64>/<str:token>/', activate_account, name='activate'),  # → /users/activate/...
+
+    # Logout
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('register/', SignupView.as_view(), name='register'),
     path('refresh-token/', TokenRefreshView.as_view(), name='token_refresh'),
 
 

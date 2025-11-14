@@ -11,6 +11,7 @@
         width: 100vw;
         margin-left: calc(-50vw + 50%);
         margin-right: calc(-50vw + 50%);
+        border-radius: 0 0 20px 20px;
     }
 
     .carousel .flex {
@@ -27,6 +28,7 @@
         width: 100%;
         height: 600px;
         object-fit: cover;
+        display: block;
     }
 
     /* Boutons de navigation */
@@ -82,7 +84,7 @@
     .carousel-indicator {
         width: 12px;
         height: 12px;
-        /* border-radius: 50%; */
+        border-radius: 50%;
         background: rgba(255, 255, 255, 0.6);
         border: 2px solid transparent;
         cursor: pointer;
@@ -122,17 +124,41 @@
 <!-- Carousel Section -->
 <div class="carousel w-full mb-12">
     <div class="flex">
-        {% for article in articles %}
-            {% if article.image and article.published %}
-                <div class="carousel-item w-full">
-                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-64 object-cover" />
-                    <div class="carousel-caption">
-                        <h3>{{ article.title }}</h3>
-                        <p>{{ article.description|truncatewords:15 }}</p>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
+        <!-- Slide 1 -->
+        <div class="carousel-item w-full">
+            <img src="{% static 'images/pexels-adrian-vocalan-80196520-8979740.jpg' %}" alt="Image inspirante" />
+            <div class="carousel-caption">
+                <h3>Découvrez des histoires captivantes</h3>
+                <p>Plongez dans un univers de récits uniques et d'expériences partagées</p>
+            </div>
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="carousel-item w-full">
+            <img src="{% static 'images/pexels-frank-minjarez-333886454-16895421.jpg' %}" alt="Communauté d'écrivains" />
+            <div class="carousel-caption">
+                <h3>Rejoignez notre communauté</h3>
+                <p>Échangez avec des passionnés d'écriture et développez votre créativité</p>
+            </div>
+        </div>
+        
+        <!-- Slide 3 -->
+        <div class="carousel-item w-full">
+            <img src="{% static 'images/pexels-markus-winkler-1430818-19813743.jpg' %}" alt="Inspiration créative" />
+            <div class="carousel-caption">
+                <h3>Trouvez l'inspiration</h3>
+                <p>Explorez des articles variés et stimulants pour nourrir votre imagination</p>
+            </div>
+        </div>
+        
+        <!-- Slide 4 -->
+        <div class="carousel-item w-full">
+            <img src="{% static 'images/pexels-mikhail-nilov-7593765.jpg' %}" alt="Partage d'idées" />
+            <div class="carousel-caption">
+                <h3>Partagez vos idées</h3>
+                <p>Votre voix compte - exprimez-vous et inspirez les autres avec vos écrits</p>
+            </div>
+        </div>
     </div>
     
     <!-- Navigation -->
@@ -151,11 +177,10 @@
     
     <!-- Indicateurs -->
     <div class="carousel-indicators">
-        {% for article in articles %}
-            {% if article.image and article.published %}
-                <button class="carousel-indicator {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></button>
-            {% endif %}
-        {% endfor %}
+        <button class="carousel-indicator active" data-index="0"></button>
+        <button class="carousel-indicator" data-index="1"></button>
+        <button class="carousel-indicator" data-index="2"></button>
+        <button class="carousel-indicator" data-index="3"></button>
     </div>
 </div>
 
@@ -169,6 +194,7 @@
         
         let currentIndex = 0;
         const totalItems = items.length;
+        let autoSlideInterval;
         
         function updateCarousel() {
             carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -183,12 +209,14 @@
         prevBtn.addEventListener('click', function() {
             currentIndex = (currentIndex - 1 + totalItems) % totalItems;
             updateCarousel();
+            resetAutoSlide();
         });
         
         // Navigation suivante
         nextBtn.addEventListener('click', function() {
             currentIndex = (currentIndex + 1) % totalItems;
             updateCarousel();
+            resetAutoSlide();
         });
         
         // Navigation par indicateurs
@@ -196,19 +224,49 @@
             indicator.addEventListener('click', function() {
                 currentIndex = parseInt(this.getAttribute('data-index'));
                 updateCarousel();
+                resetAutoSlide();
             });
         });
         
-        // Défilement automatique (optionnel)
-        setInterval(() => {
-            currentIndex = (currentIndex + 1) % totalItems;
-            updateCarousel();
-        }, 5000);
+        // Défilement automatique
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalItems;
+                updateCarousel();
+            }, 5000);
+        }
+        
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+        
+        // Pause du défilement automatique au survol
+        carousel.parentElement.addEventListener('mouseenter', () => {
+            clearInterval(autoSlideInterval);
+        });
+        
+        carousel.parentElement.addEventListener('mouseleave', () => {
+            startAutoSlide();
+        });
+        
+        // Navigation au clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+                updateCarousel();
+                resetAutoSlide();
+            } else if (e.key === 'ArrowRight') {
+                currentIndex = (currentIndex + 1) % totalItems;
+                updateCarousel();
+                resetAutoSlide();
+            }
+        });
+        
+        // Initialisation
+        startAutoSlide();
     });
 </script>
-
-
-
 
 <!-- Hero Section -->
 <section class="hero-section relative flex flex-col items-center justify-center min-h-[60vh] mb-12">
@@ -224,7 +282,6 @@
 </section>
 
 <style>
-   <style>
     /* About Section */
     .about-section {
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -614,6 +671,7 @@
         </div>
     </div>
 </section>
+
 <!-- Articles Section -->
 <section id="articles" class="articles-section max-w-6xl mx-auto mb-16">
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Articles ({{ article_count }})</h2>
@@ -638,6 +696,7 @@
         {% endfor %}
     </div>
 </section>
+
 <!-- Comments Section -->
 <section id="comments" class="comments-section max-w-4xl mx-auto mb-16">
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Commentaires</h2>

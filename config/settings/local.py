@@ -30,7 +30,18 @@ CACHES = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
 EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = 1025
+# EMAIL_PORT = 1025
+# === EMAIL EN MODE CONSOLE (DÉVELOPPEMENT) ===
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Hôte SMTP pour Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER='fotsoeddysteve@gmail.com'
+EMAIL_HOST_PASSWORD='iwpq qosi aalq pywo'
+  # Mot de passe d'application Gmail
+# ADMIN
 
 # WhiteNoise
 # ------------------------------------------------------------------------------
@@ -68,8 +79,29 @@ if env("USE_DOCKER", default="no") == "yes":
 INSTALLED_APPS += ["django_extensions"]
 # Celery
 # ------------------------------------------------------------------------------
-
+# config/settings/local.py  (ou base.py si partagé)
+FRONTEND_URL = 'http://127.0.0.1:8000'  # ← À AJOUTER
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+def show_toolbar(request):
+    if request.path.startswith('/api/'):
+        return False
+    return True
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": "config.settings.local.show_toolbar",
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Autorise TOUT
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}

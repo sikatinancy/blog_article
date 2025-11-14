@@ -1,235 +1,203 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlogApp</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlogApp</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static './css/output.css' %}">
+<link rel="stylesheet" href="{% static './css/output.css' %}">
     {% include 'includes/navbar.html' %}
 </head>
 <body class="bg-background text-gray-800">
-    
-    <main class="container mx-auto p-4">
+<main class="container mx-auto p-4">
         {% block content %}
         {% endblock %}
-    </main>
-  <style>
-    .footer {
-        background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #ff9256 100%);
-        color: white;
-        margin-top: auto;
+</main>
+<style>
+.footer {
+background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #ff9256 100%);
+color: white;
+margin-top: auto;
     }
-
-    .footer-content {
-        max-width: 7xl;
-        margin: 0 auto;
-        padding: 3rem 1rem;
+.footer-content {
+max-width: 7xl;
+margin: 0 auto;
+padding: 3rem 1rem;
     }
-
-    .footer-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
+.footer-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 2rem;
+margin-bottom: 2rem;
     }
-
-    .footer-section h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: white;
-        position: relative;
+.footer-section h3 {
+font-size: 1.25rem;
+font-weight: 700;
+margin-bottom: 1rem;
+color: white;
+position: relative;
     }
-
-    .footer-section h3::after {
-        content: '';
-        position: absolute;
-        bottom: -0.5rem;
-        left: 0;
-        width: 40px;
-        height: 2px;
-        background: #ff9256;
+.footer-section h3::after {
+content: '';
+position: absolute;
+bottom: -0.5rem;
+left: 0;
+width: 40px;
+height: 2px;
+background: #ff9256;
     }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+.footer-links {
+list-style: none;
+padding: 0;
+margin: 0;
     }
-
-    .footer-links li {
-        margin-bottom: 0.5rem;
+.footer-links li {
+margin-bottom: 0.5rem;
     }
-
-    .footer-links a {
-        color: rgba(255, 255, 255, 0.8);
-        text-decoration: none;
-        transition: all 0.3s ease;
-        padding: 0.25rem 0;
-        display: block;
-        border-radius: 0.25rem;
+.footer-links a {
+color: rgba(255, 255, 255, 0.8);
+text-decoration: none;
+transition: all 0.3s ease;
+padding: 0.25rem 0;
+display: block;
+border-radius: 0.25rem;
     }
-
-    .footer-links a:hover {
-        color: white;
-        transform: translateX(5px);
-        background: rgba(255, 255, 255, 0.1);
-        padding-left: 0.5rem;
+.footer-links a:hover {
+color: white;
+transform: translateX(5px);
+background: rgba(255, 255, 255, 0.1);
+padding-left: 0.5rem;
     }
-
-    .footer-contact p {
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+.footer-contact p {
+color: rgba(255, 255, 255, 0.8);
+margin-bottom: 0.5rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
     }
-
-    .social-links {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
+.social-links {
+display: flex;
+gap: 1rem;
+margin-top: 1rem;
     }
-
-    .social-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+.social-link {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 40px;
+height: 40px;
+background: rgba(255, 255, 255, 0.1);
+border-radius: 50%;
+color: white;
+text-decoration: none;
+transition: all 0.3s ease;
+border: 2px solid transparent;
     }
-
-    .social-link:hover {
-        background: #ff9256;
-        transform: translateY(-2px);
-        border-color: white;
+.social-link:hover {
+background: #ff9256;
+transform: translateY(-2px);
+border-color: white;
     }
-
-    .footer-bottom {
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        padding-top: 2rem;
-        text-align: center;
+.footer-bottom {
+border-top: 1px solid rgba(255, 255, 255, 0.2);
+padding-top: 2rem;
+text-align: center;
     }
-
-    .footer-bottom-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+.footer-bottom-content {
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 1rem;
     }
-
-    .footer-copyright {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.9rem;
+.footer-copyright {
+color: rgba(255, 255, 255, 0.8);
+font-size: 0.9rem;
     }
-
-    .footer-legal {
-        display: flex;
-        gap: 1.5rem;
+.footer-legal {
+display: flex;
+gap: 1.5rem;
     }
-
-    .footer-legal a {
-        color: rgba(255, 255, 255, 0.8);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.3s ease;
+.footer-legal a {
+color: rgba(255, 255, 255, 0.8);
+text-decoration: none;
+font-size: 0.9rem;
+transition: color 0.3s ease;
     }
-
-    .footer-legal a:hover {
-        color: white;
+.footer-legal a:hover {
+color: white;
     }
-
-    .newsletter-form {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
+.newsletter-form {
+display: flex;
+gap: 0.5rem;
+margin-top: 1rem;
     }
-
-    .newsletter-input {
-        flex: 1;
-        padding: 0.5rem 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 0.375rem;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        outline: none;
+.newsletter-input {
+flex: 1;
+padding: 0.5rem 1rem;
+border: 1px solid rgba(255, 255, 255, 0.3);
+border-radius: 0.375rem;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+outline: none;
     }
-
-    .newsletter-input::placeholder {
-        color: rgba(255, 255, 255, 0.6);
+.newsletter-input::placeholder {
+color: rgba(255, 255, 255, 0.6);
     }
-
-    .newsletter-input:focus {
-        border-color: #ff9256;
-        background: rgba(255, 255, 255, 0.15);
+.newsletter-input:focus {
+border-color: #ff9256;
+background: rgba(255, 255, 255, 0.15);
     }
-
-    .newsletter-btn {
-        background: #ff9256;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
+.newsletter-btn {
+background: #ff9256;
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 0.375rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
     }
-
-    .newsletter-btn:hover {
-        background: #ff7b3a;
-        transform: translateY(-1px);
+.newsletter-btn:hover {
+background: #ff7b3a;
+transform: translateY(-1px);
     }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 2rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+.footer-grid {
+grid-template-columns: 1fr;
+gap: 2rem;
         }
-
-        .footer-bottom-content {
-            flex-direction: column;
-            text-align: center;
+.footer-bottom-content {
+flex-direction: column;
+text-align: center;
         }
-
-        .footer-legal {
-            justify-content: center;
+.footer-legal {
+justify-content: center;
         }
-
-        .newsletter-form {
-            flex-direction: column;
+.newsletter-form {
+flex-direction: column;
         }
     }
-
-    @media (max-width: 480px) {
-        .footer-content {
-            padding: 2rem 1rem;
+@media (max-width: 480px) {
+.footer-content {
+padding: 2rem 1rem;
         }
-
-        .footer-legal {
-            flex-direction: column;
-            gap: 0.5rem;
+.footer-legal {
+flex-direction: column;
+gap: 0.5rem;
         }
     }
 </style>
-
 <footer class="footer">
-    <div class="footer-content">
-        <div class="footer-grid">
-            <!-- Section À propos -->
-            <div class="footer-section">
-                <h3>À propos de BlogApp</h3>
-                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin-bottom: 1rem;">
-                    BlogApp est la plateforme de référence pour partager vos idées, 
-                    découvrir de nouveaux articles et connecter avec une communauté 
+<div class="footer-content">
+<div class="footer-grid">
+<!-- Section À propos -->
+<div class="footer-section">
+<h3>À propos de BlogApp</h3>
+<p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin-bottom: 1rem;">
+                    BlogApp est la plateforme de référence pour partager vos idées,
+                    découvrir de nouveaux articles et connecter avec une communauté
                     passionnée d'écriture et de lecture.
                 </p>
                 <div class="social-links">
@@ -257,7 +225,6 @@
                     </a>
                 </div>
             </div>
-
             <!-- Section Liens rapides -->
             <div class="footer-section">
                 <h3>Liens rapides</h3>
@@ -270,7 +237,6 @@
                     <li><a href="{% url 'users:register' %}">Inscription</a></li>
                 </ul>
             </div>
-
             <!-- Section Catégories -->
             <div class="footer-section">
                 <h3>Catégories</h3>
@@ -283,20 +249,18 @@
                     <li><a href="#">Actualités</a></li>
                 </ul>
             </div>
-
             <!-- Section Newsletter -->
             <div class="footer-section">
                 <h3>Newsletter</h3>
                 <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1rem;">
                     Inscrivez-vous pour recevoir les derniers articles et actualités.
                 </p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Votre email" class="newsletter-input" required>
+                <form class="newsletter-form" id="newsletter-form">
+                    <input type="email" placeholder="Votre email" class="newsletter-input" id="newsletter-email" required>
                     <button type="submit" class="newsletter-btn">S'abonner</button>
                 </form>
             </div>
         </div>
-
         <!-- Footer bottom -->
         <div class="footer-bottom">
             <div class="footer-bottom-content">
@@ -313,5 +277,118 @@
         </div>
     </div>
 </footer>
+<!-- Modal pour sélection des auteurs -->
+<div id="author-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div style="background-color: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <span id="close-modal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choisissez vos auteurs</h2>
+        <p style="text-align: center; color: #6b7280; font-size: 0.95rem;">Sélectionnez un ou plusieurs auteurs (triés par nombre d'articles) pour recevoir leurs nouvelles publications.</p>
+        <form id="author-selection-form">
+            <div id="authors-list" style="max-height: 320px; overflow-y: auto; margin: 15px 0; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb;"></div>
+            <button type="submit" style="background: #3b82f6; color: white; padding: 12px; width: 100%; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; transition: background 0.3s;">
+                Confirmer l'abonnement
+            </button>
+        </form>
+        <p id="subscription-message" style="text-align: center; margin-top: 12px; font-weight: 500; color: #10b981;"></p>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('newsletter-form');
+    const emailInput = document.getElementById('newsletter-email');
+    const modal = document.getElementById('author-modal');
+    const closeModal = document.getElementById('close-modal');
+    const authorsList = document.getElementById('authors-list');
+    const selectionForm = document.getElementById('author-selection-form');
+    const message = document.getElementById('subscription-message');
+
+    function getCSRFToken() {
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookieValue ? cookieValue.split('=')[1] : '';
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = emailInput.value.trim().toLowerCase();
+        if (!email || !email.includes('@')) {
+            alert('Veuillez entrer un email valide.');
+            return;
+        }
+        try {
+            const response = await fetch('/newsletter/start/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                authorsList.innerHTML = '';
+                data.authors.forEach(author => {
+                    const div = document.createElement('div');
+                    div.style = 'margin: 8px 0; padding: 8px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center;';
+                    div.innerHTML = `
+                        <input type="checkbox" name="authors" value="${author.id}" style="margin-right: 10px; accent-color: #3b82f6;">
+                        <label style="cursor: pointer; font-size: 0.95rem;"><strong>${author.name}</strong> <small style="color: #6b7280;">(${author.article_count} articles)</small></label>
+                    `;
+                    authorsList.appendChild(div);
+                });
+                modal.style.display = 'block';
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Erreur lors de la requête.');
+        }
+    });
+
+    selectionForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = emailInput.value.trim().toLowerCase();
+        const selectedAuthors = Array.from(document.querySelectorAll('input[name="authors"]:checked')).map(checkbox => checkbox.value);
+        if (selectedAuthors.length === 0) {
+            alert('Sélectionnez au moins un auteur.');
+            return;
+        }
+        try {
+            const response = await fetch('/newsletter/confirm/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ email, authors: selectedAuthors }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                message.textContent = data.message;
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    emailInput.value = '';
+                    message.textContent = '';
+                }, 3000);
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Erreur lors de la confirmation.');
+        }
+    });
+
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
 </body>
 </html>

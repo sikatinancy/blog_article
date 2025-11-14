@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Activez votre compte</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(to right, #6366f1, #8b5cf6); padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0;">BlogApp</h1>
+        </div>
+        <div style="padding: 30px; text-align: center;">
+            <h2>Bienvenue, {{ user.username }} !</h2>
+            <p>Cliquez sur le bouton pour activer votre compte :</p>
+
+            <!-- LIEN CORRIGÉ : utilise {{ activation_link }} passé depuis la vue -->
+            <a href="{{ activation_link }}"
+               style="background:#6366f1;color:white;padding:12px 30px;
+                      text-decoration:none;border-radius:50px;display:inline-block;
+                      margin:20px 0;font-weight:bold;">
+                Activer mon compte
+            </a>
+
+            <p style="color: #666; font-size: 0.9em;">
+                Ce lien expire dans 24 heures.<br>
+                Si vous n'avez pas créé de compte, ignorez cet email.
+            </p>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; text-align: center; font-size: 0.8em; color: #888;">
+            © 2025 BlogApp. Tous droits réservés.
+        </div>
+    </div>
+</body>
+</html>

@@ -6,8 +6,8 @@
         <p><strong>Contenu :</strong> {{ comment.content }}</p>
         <p><strong>Publié :</strong> {{ comment.published|yesno:"Oui,Non" }}</p>
         <div class="flex space-x-2 mt-4">
-            <a href="{% url 'blog:comment_edit' comment.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
-            <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
+            <a href="{% url 'blogs:comment_edit' comment.id %}" class="bg-accent text-white p-2 rounded">Modifier</a>
+            <form method="post" action="{% url 'blogs:comment_delete' comment.id %}">
                 {% csrf_token %}
                 <button type="submit" class="bg-red-500 text-white p-2 rounded">Supprimer</button>
             </form>
