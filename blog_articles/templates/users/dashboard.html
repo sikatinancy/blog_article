@@ -1,448 +1,1126 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
-<!-- === SECTION PROFIL UTILISATEUR === -->
-<div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-4xl mx-auto px-4">
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-12">
-            <div class="flex items-center gap-6 mb-8">
-                <!-- Photo ronde -->
-                {% if user.profile.profile_image %}
-                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-24 h-24 rounded-full object-cover border-4 border-primary shadow-md">
-                {% else %}
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                        {{ user.username.0|upper }}
-                    </div>
-                {% endif %}
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Bienvenue, {{ user.username }} !</h1>
-                    <p class="text-gray-600">{{ user.email }}</p>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Utilisateur - BlogApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #2563eb;
+            --accent: #ff9256;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
 
-            <!-- Boutons d'action -->
-            <div class="mb-8 flex gap-3">
-                <button type="button" onclick="document.getElementById('create-article-modal').classList.remove('hidden')" class="btn-accent">Créer un article</button>
-                <button type="button" onclick="document.getElementById('create-comment-modal').classList.remove('hidden')" class="btn-accent">Écrire un commentaire</button>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'users:logout' %}" class="btn-danger ml-auto">Déconnexion</a>
-                {% endif %}
-            </div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            <!-- Statistiques rapides -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-gray-50 p-6 rounded-xl">
-                    <h3 class="font-semibold text-lg mb-2">Mes articles</h3>
-                    <p class="text-gray-600">{{ article_count }} article{{ article_count|pluralize }}</p>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-xl">
-                    <h3 class="font-semibold text-lg mb-2">Statistiques</h3>
-                    <p class="text-gray-600">{{ comment_count }} commentaire{{ comment_count|pluralize }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
 
-<!-- === SECTION ARTICLES === -->
-<section id="articles" class="articles-section max-w-6xl mx-auto mb-16 px-4">
-    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Mes articles ({{ article_count }})</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for article in articles %}
-        <div class="article-card bg-white rounded-xl shadow-md overflow-hidden" data-id="{{ article.id }}">
-            {% if article.image %}
-                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover">
-            {% else %}
-                <img src="{% static 'default_article_image.jpg' %}" alt="Image par défaut" class="w-full h-48 object-cover">
-            {% endif %}
-            <div class="p-6">
-                <h3 class="article-title text-xl font-semibold mb-2">{{ article.title }}</h3>
-                <p class="article-desc text-gray-600 mb-2 line-clamp-2">{{ article.description|truncatewords:20 }}</p>
-                <p class="text-sm text-gray-500">Publié : {{ article.published|yesno:"Oui,Non" }}</p>
-                <p class="text-sm text-gray-500">Créé le : {{ article.created_at|date:"d/m/Y H:i" }}</p>
-                <div class="mt-4 flex gap-2">
-                    <a href="{% url 'blog:article_detail' article.id %}" class="btn-primary">Voir</a>
-                    <button type="button" class="btn-accent edit-article-btn"
-                            data-id="{{ article.id }}"
-                            data-title="{{ article.title|escape }}"
-                            data-description="{{ article.description|escape }}"
-                            data-content="{{ article.content|escape }}"
-                            data-category="{{ article.category|default_if_none:''|escape }}"
-                            data-published="{{ article.published|yesno:'true,false' }}"
-                            data-image="{% if article.image %}{{ article.image.url|escape }}{% else %}''{% endif %}">
-                        Modifier
-                    </button>
-                    <button type="button" class="btn-danger delete-btn" data-id="{{ article.id }}" data-type="article">Supprimer</button>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <p class="text-center text-gray-500 col-span-full">Aucun article pour le moment.</p>
-        {% endfor %}
-    </div>
-</section>
+        .user-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-<!-- === SECTION COMMENTAIRES === -->
-<section class="max-w-6xl mx-auto mb-16 px-4">
-    <h3 class="text-xl font-semibold text-primary mb-4">Mes commentaires ({{ comment_count }})</h3>
-    <div class="space-y-4">
-        {% for comment in comments %}
-        <div class="dashboard-card bg-white rounded-xl shadow-md p-6" data-id="{{ comment.id }}">
-            <p class="text-gray-700 mb-2">{{ comment.content }}</p>
-            <p class="text-sm text-gray-500">Sur : <strong>{{ comment.article.title }}</strong></p>
-            <p class="text-sm text-gray-500">Publié : {{ comment.published|yesno:"Oui,Non" }}</p>
-            <p class="text-sm text-gray-500">Créé le : {{ comment.created_at|date:"d/m/Y H:i" }}</p>
-            <div class="mt-3 flex gap-2">
-                <a href="{% url 'blog:comment_detail' comment.id %}" class="btn-primary">Voir</a>
-                <button type="button" class="btn-accent edit-comment-btn"
-                        data-id="{{ comment.id }}"
-                        data-content="{{ comment.content|escape }}"
-                        data-article-id="{{ comment.article.id }}"
-                        data-published="{{ comment.published|yesno:'true,false' }}">
-                    Modifier
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 4px 0 20px rgba(30, 58, 138, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header h2 i {
+            color: var(--accent);
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-title {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0.25rem 0;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+
+        .profile-info h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-info p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.articles::before { background: linear-gradient(135deg, var(--success), #34d399); }
+        .stat-card.comments::before { background: linear-gradient(135deg, var(--warning), #fbbf24); }
+        .stat-card.likes::before { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .stat-card.views::before { background: linear-gradient(135deg, var(--info), #60a5fa); }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.articles .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.comments .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-card.likes .stat-icon { background: rgba(30, 58, 138, 0.1); color: var(--primary); }
+        .stat-card.views .stat-icon { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card.articles .stat-value { color: var(--success); }
+        .stat-card.comments .stat-value { color: var(--warning); }
+        .stat-card.likes .stat-value { color: var(--primary); }
+        .stat-card.views .stat-value { color: var(--info); }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* DataTables Styles avec fond bleu et texte blanc */
+        .dataTables_wrapper {
+            margin-top: 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-left: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_filter input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin: 0 0.5rem;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border: 1px solid var(--primary);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            margin-left: 0.25rem;
+            background-color: var(--primary);
+            color: white !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-primary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-panel {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                text-align: left;
+                margin-bottom: 1rem;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="user-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <i class="fas fa-user-circle"></i>
+                    Mon Espace
+                </h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
                 </button>
-                <button type="button" class="btn-danger delete-btn" data-id="{{ comment.id }}" data-type="comment">Supprimer</button>
             </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Navigation</div>
+                <ul class="nav-links">
+                    <li><a href="#profile" class="active">
+                        <i class="fas fa-user"></i>
+                        Mon Profil
+                    </a></li>
+                    <li><a href="#articles">
+                        <i class="fas fa-newspaper"></i>
+                        Mes Articles
+                    </a></li>
+                    <li><a href="#comments">
+                        <i class="fas fa-comments"></i>
+                        Mes Commentaires
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Actions</div>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="openCreateArticleModal(); return false;">
+                        <i class="fas fa-edit"></i>
+                        Créer un article
+                    </a></li>
+                    <li><a href="#" onclick="openCreateCommentModal(); return false;">
+                        <i class="fas fa-comment"></i>
+                        Écrire un commentaire
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Compte</div>
+                <ul class="nav-links">
+                    <li><a href="#">
+                        <i class="fas fa-cog"></i>
+                        Paramètres
+                    </a></li>
+                    <li><a href="{% url 'users:logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de Bord Utilisateur
+                </h1>
+            </div>
+
+            <!-- Profile Section -->
+            <section id="profile" class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        {% if user.profile.profile_image %}
+                            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-full h-full rounded-full object-cover">
+                        {% else %}
+                            {{ user.username.0|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <h2>Bienvenue, {{ user.username }} !</h2>
+                        <p>{{ user.email }}</p>
+                        <p class="text-sm text-gray-500">Membre depuis {{ user.date_joined|date:"F Y" }}</p>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="btn btn-accent" onclick="openEditProfileModal()">
+                        <i class="fas fa-edit"></i>Modifier le profil
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-cog"></i>Paramètres
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card articles">
+                    <div class="stat-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="stat-value">{{ article_count }}</div>
+                    <div class="stat-label">Articles publiés</div>
+                </div>
+                <div class="stat-card comments">
+                    <div class="stat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-value">{{ comment_count }}</div>
+                    <div class="stat-label">Commentaires</div>
+                </div>
+                <div class="stat-card likes">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">J'aime reçus</div>
+                </div>
+                <div class="stat-card views">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-value">2.4K</div>
+                    <div class="stat-label">Vues d'articles</div>
+                </div>
+            </div>
+
+            <!-- Articles Section avec DataTable -->
+            <section id="articles" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-newspaper"></i>
+                        Mes Articles ({{ article_count }})
+                    </h2>
+                </div>
+                <table id="articles-table" class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for article in articles %}
+                        <tr data-id="{{ article.id }}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.id }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ article.title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.category|default:"Non catégorisé" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if article.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                    {% if article.published %}Publié{% else %}Brouillon{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.created_at|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.views|default:"0" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="{% url 'blog:article_detail' article.id %}" class="btn btn-view">
+                                        <i class="fas fa-eye"></i>Voir
+                                    </a>
+                                    <button class="btn btn-edit edit-article-btn"
+                                            data-id="{{ article.id }}"
+                                            data-title="{{ article.title|escapejs }}"
+                                            data-description="{{ article.description|escapejs }}"
+                                            data-content="{{ article.content|escapejs }}"
+                                            data-category="{{ article.category|default_if_none:''|escapejs }}"
+                                            data-published="{{ article.published|yesno:'true,false' }}"
+                                            data-image="{% if article.image %}{{ article.image.url|escapejs }}{% else %}''{% endif %}">
+                                        <i class="fas fa-edit"></i>Modifier
+                                    </button>
+                                    <button class="btn btn-delete delete-btn" data-id="{{ article.id }}" data-type="article">
+                                        <i class="fas fa-trash"></i>Supprimer
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Comments Section avec DataTable -->
+            <section id="comments" class="content-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-comments"></i>
+                        Mes Commentaires ({{ comment_count }})
+                    </h2>
+                </div>
+                <table id="comments-table" class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenu</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for comment in comments %}
+                        <tr data-id="{{ comment.id }}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.id }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900">{{ comment.content|truncatewords:10 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.article.title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if comment.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                    {% if comment.published %}Publié{% else %}Non publié{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.created_at|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="{% url 'blog:comment_detail' comment.id %}" class="btn btn-view">
+                                        <i class="fas fa-eye"></i>Voir
+                                    </a>
+                                    <button class="btn btn-edit edit-comment-btn"
+                                            data-id="{{ comment.id }}"
+                                            data-content="{{ comment.content|escapejs }}"
+                                            data-article-id="{{ comment.article.id }}"
+                                            data-published="{{ comment.published|yesno:'true,false' }}">
+                                        <i class="fas fa-edit"></i>Modifier
+                                    </button>
+                                    <button class="btn btn-delete delete-btn" data-id="{{ comment.id }}" data-type="comment">
+                                        <i class="fas fa-trash"></i>Supprimer
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
         </div>
-        {% empty %}
-        <p class="text-center text-gray-500">Aucun commentaire pour le moment.</p>
-        {% endfor %}
     </div>
-</section>
 
-<!-- === MODALES (CRÉER, MODIFIER, SUPPRIMER) === -->
-<!-- MODAL CRÉER ARTICLE -->
-<div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-        <h3 class="text-xl font-bold mb-4">Créer un article</h3>
-        <form method="post" id="create-article-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-                <input type="text" name="title" class="form-control" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea name="description" class="form-control" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                <textarea name="content" class="form-control" rows="5" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-                <input type="text" name="category" class="form-control" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                <input type="file" name="image" accept="image/*" class="form-control">
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" name="published" id="published" class="h-4 w-4 text-primary">
-                <label for="published" class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-accent">Créer</button>
-            </div>
-        </form>
+    <!-- Modals -->
+    <div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Créer un article</h3>
+            <form method="post" id="create-article-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                    <input type="text" name="title" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                    <textarea name="content" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                    <input type="text" name="category" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                    <input type="file" name="image" accept="image/*" class="form-control">
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" name="published" id="published" class="h-4 w-4 text-primary">
+                    <label for="published" class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('create-article-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Créer</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- MODAL ÉDITER ARTICLE -->
-<div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-        <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
-        <form method="post" id="edit-article-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="id" id="edit-article-id">
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-                <input type="text" name="title" id="edit-title" class="form-control" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea name="description" id="edit-description" class="form-control" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                <textarea name="content" id="edit-content" class="form-control" rows="5" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-                <input type="text" name="category" id="edit-category" class="form-control" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                <input type="file" name="image" id="edit-image" accept="image/*" class="form-control">
-                <p id="current-image" class="text-sm text-gray-500 mt-1"></p>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
-                <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-accent">Modifier</button>
-            </div>
-        </form>
+    <div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
+            <form method="post" id="edit-article-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-article-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                    <input type="text" name="title" id="edit-title" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" id="edit-description" class="form-control" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                    <textarea name="content" id="edit-content" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                    <input type="text" name="category" id="edit-category" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                    <input type="file" name="image" id="edit-image" accept="image/*" class="form-control">
+                    <p id="current-image" class="text-sm text-gray-500 mt-1"></p>
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
+                    <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('edit-article-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- MODAL SUPPRIMER ARTICLE -->
-<div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-        <h3 class="text-xl font-bold mb-4">Supprimer l'article ?</h3>
-        <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
-        <form method="post" id="delete-article-form">
-            {% csrf_token %}
-            <input type="hidden" name="id" id="delete-article-id">
-            <div class="flex justify-center gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-danger">Supprimer</button>
-            </div>
-        </form>
+    <div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-sm w-full p-6 text-center">
+            <h3 class="text-xl font-bold mb-4">Supprimer l'article ?</h3>
+            <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
+            <form method="post" id="delete-article-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-article-id">
+                <div class="flex justify-center gap-3">
+                    <button type="button" onclick="closeModal('delete-article-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- MODAL CRÉER COMMENTAIRE -->
-<div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-        <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
-        <form method="post" id="create-comment-form">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                <textarea name="content" class="form-control" rows="4" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
-                <select name="article" class="form-control" required>
-                    {% for article in articles %}
-                    <option value="{{ article.id }}">{{ article.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" name="published" class="h-4 w-4 text-primary">
-                <label class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-accent">Créer</button>
-            </div>
-        </form>
+    <div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
+            <form method="post" id="create-comment-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                    <textarea name="content" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                    <select name="article" class="form-control" required>
+                        {% for article in articles %}
+                        <option value="{{ article.id }}">{{ article.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" name="published" class="h-4 w-4 text-primary">
+                    <label class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('create-comment-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Créer</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- MODAL ÉDITER COMMENTAIRE -->
-<div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-        <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
-        <form method="post" id="edit-comment-form">
-            {% csrf_token %}
-            <input type="hidden" name="id" id="edit-comment-id">
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                <textarea name="content" id="edit-content" class="form-control" rows="4" required></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
-                <select name="article" id="edit-article" class="form-control" required>
-                    {% for article in articles %}
-                    <option value="{{ article.id }}">{{ article.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
-                <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-accent">Modifier</button>
-            </div>
-        </form>
+    <div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
+            <form method="post" id="edit-comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="edit-comment-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                    <textarea name="content" id="edit-content" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                    <select name="article" id="edit-article" class="form-control" required>
+                        {% for article in articles %}
+                        <option value="{{ article.id }}">{{ article.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
+                    <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('edit-comment-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-accent">Modifier</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- MODAL SUPPRIMER COMMENTAIRE -->
-<div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-    <div class="modal-panel bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-        <h3 class="text-xl font-bold mb-4">Supprimer le commentaire ?</h3>
-        <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
-        <form method="post" id="delete-comment-form">
-            {% csrf_token %}
-            <input type="hidden" name="id" id="delete-comment-id">
-            <div class="flex justify-center gap-3">
-                <button type="button" onclick="this.closest('.modal-backdrop').classList.add('hidden')" class="btn-primary">Annuler</button>
-                <button type="submit" class="btn-danger">Supprimer</button>
-            </div>
-        </form>
+    <div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-sm w-full p-6 text-center">
+            <h3 class="text-xl font-bold mb-4">Supprimer le commentaire ?</h3>
+            <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
+            <form method="post" id="delete-comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="delete-comment-id">
+                <div class="flex justify-center gap-3">
+                    <button type="button" onclick="closeModal('delete-comment-modal')" class="btn-primary">Annuler</button>
+                    <button type="submit" class="btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- === SCRIPTS AJAX === -->
-<script>
-const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-// === ARTICLES ===
-document.getElementById('create-article-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const data = new FormData(this);
-    try {
-        const res = await fetch("{% url 'blog:article_create' %}", {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken },
-            body: data
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
+    <script>
+        // Initialisation des DataTables avec style bleu et texte blanc
+        $(document).ready(function() {
+            $('#articles-table').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+                },
+                pageLength: 10,
+                responsive: true,
+                dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
+            });
+            
+            $('#comments-table').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+                },
+                pageLength: 10,
+                responsive: true,
+                dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
+            });
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la création de l\'article.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
 
-// OUVRIR MODALE ÉDITION
-document.querySelectorAll('.edit-article-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('edit-article-id').value = btn.dataset.id;
-        document.getElementById('edit-title').value = btn.dataset.title;
-        document.getElementById('edit-description').value = btn.dataset.description;
-        document.getElementById('edit-content').value = btn.dataset.content;
-        document.getElementById('edit-category').value = btn.dataset.category;
-        document.getElementById('edit-published').checked = btn.dataset.published === 'true';
-        document.getElementById('current-image').innerHTML = btn.dataset.image
-            ? `<img src="${btn.dataset.image}" class="w-20 h-20 object-cover rounded mt-2">`
-            : 'Aucune image';
-        document.getElementById('edit-article-modal').classList.remove('hidden');
-    });
-});
+        // Récupérer le token CSRF
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-// MODIFIER ARTICLE
-document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('edit-article-id').value;
-    const data = new FormData(this);
-    try {
-        const res = await fetch(`/blog/articles/${id}/edit/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken },
-            body: data
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        // Modal functions
+        function openCreateArticleModal() {
+            document.getElementById('create-article-modal').classList.remove('hidden');
+        }
+
+        function openCreateCommentModal() {
+            document.getElementById('create-comment-modal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // === ARTICLES ===
+        document.getElementById('create-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'blog:article_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la création de l\'article.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la modification.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
 
-// SUPPRIMER ARTICLE
-document.querySelectorAll('.delete-btn[data-type="article"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('delete-article-id').value = btn.dataset.id;
-        document.getElementById('delete-article-modal').classList.remove('hidden');
-    });
-});
-
-document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('delete-article-id').value;
-    try {
-        const res = await fetch(`/blog/articles/${id}/delete/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken }
+        // OUVRIR MODALE ÉDITION
+        document.querySelectorAll('.edit-article-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('edit-article-id').value = btn.dataset.id;
+                document.getElementById('edit-title').value = btn.dataset.title;
+                document.getElementById('edit-description').value = btn.dataset.description;
+                document.getElementById('edit-content').value = btn.dataset.content;
+                document.getElementById('edit-category').value = btn.dataset.category;
+                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
+                document.getElementById('current-image').innerHTML = btn.dataset.image
+                    ? `<img src="${btn.dataset.image}" class="w-20 h-20 object-cover rounded mt-2">`
+                    : 'Aucune image';
+                document.getElementById('edit-article-modal').classList.remove('hidden');
+            });
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la suppression.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
 
-// === COMMENTAIRES ===
-document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const data = new FormData(this);
-    try {
-        const res = await fetch("{% url 'blog:comment_create' %}", {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken },
-            body: data
+        // MODIFIER ARTICLE
+        document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-article-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/blog/articles/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la modification.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la création du commentaire.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
 
-document.querySelectorAll('.edit-comment-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('edit-comment-id').value = btn.dataset.id;
-        document.getElementById('edit-content').value = btn.dataset.content;
-        document.getElementById('edit-article').value = btn.dataset.articleId;
-        document.getElementById('edit-published').checked = btn.dataset.published === 'true';
-        document.getElementById('edit-comment-modal').classList.remove('hidden');
-    });
-});
-
-document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('edit-comment-id').value;
-    const data = new FormData(this);
-    try {
-        const res = await fetch(`/blog/comment/${id}/edit/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken },
-            body: data
+        // SUPPRIMER ARTICLE
+        document.querySelectorAll('.delete-btn[data-type="article"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('delete-article-id').value = btn.dataset.id;
+                document.getElementById('delete-article-modal').classList.remove('hidden');
+            });
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la modification du commentaire.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
 
-document.querySelectorAll('.delete-btn[data-type="comment"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('delete-comment-id').value = btn.dataset.id;
-        document.getElementById('delete-comment-modal').classList.remove('hidden');
-    });
-});
-
-document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const id = document.getElementById('delete-comment-id').value;
-    try {
-        const res = await fetch(`/blog/comment/${id}/delete/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken }
+        document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-article-id').value;
+            try {
+                const res = await fetch(`/blog/articles/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la suppression.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
         });
-        if (res.ok) location.reload();
-        else alert('Erreur lors de la suppression du commentaire.');
-    } catch (err) {
-        alert('Erreur réseau.');
-    }
-});
-</script>
 
-<style>
-.modal-backdrop {
-    background: rgba(0, 0, 0, 0.5);
-}
-.modal-panel {
-    animation: fadeIn 0.3s ease-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-.line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-</style>
-{% endblock %}
+        // === COMMENTAIRES ===
+        document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(this);
+            try {
+                const res = await fetch("{% url 'blog:comment_create' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la création du commentaire.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
+        });
+
+        document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('edit-comment-id').value = btn.dataset.id;
+                document.getElementById('edit-content').value = btn.dataset.content;
+                document.getElementById('edit-article').value = btn.dataset.articleId;
+                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
+                document.getElementById('edit-comment-modal').classList.remove('hidden');
+            });
+        });
+
+        document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-comment-id').value;
+            const data = new FormData(this);
+            try {
+                const res = await fetch(`/blog/comment/${id}/edit/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: data
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la modification du commentaire.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
+        });
+
+        document.querySelectorAll('.delete-btn[data-type="comment"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('delete-comment-id').value = btn.dataset.id;
+                document.getElementById('delete-comment-modal').classList.remove('hidden');
+            });
+        });
+
+        document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-comment-id').value;
+            try {
+                const res = await fetch(`/blog/comment/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                if (res.ok) location.reload();
+                else alert('Erreur lors de la suppression du commentaire.');
+            } catch (err) {
+                alert('Erreur réseau.');
+            }
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
