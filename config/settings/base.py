@@ -5,7 +5,9 @@ import ssl
 from pathlib import Path
 
 import environ
-
+import os
+from decouple import config
+import dj_database_url
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # blog_articles/
 APPS_DIR = BASE_DIR / "blog_articles"
@@ -27,30 +29,31 @@ USE_TZ = True
 LOCALE_PATHS = [str(BASE_DIR / "locale")]
 SECRET_KEY="0oYSr5ocR66AT1rMACZ8XgAMWoPWpLMCXKG3uIUJDy57kHpFz40A3Ms2xTiiNXOR"
 
-# DATABASES
-# ------------------------------------------------------------------------------
-# DATABASES = {"default": env.db("DATABASE_URL", default='postgres://melissa:1234@localhost:5432/articles2')}
-# DATABASES["default"]["ATOMIC_REQUESTS"] = True
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-if DEBUG:
+DEBUG = config('DEBUG', default=True, cast=bool)
+SECRET_KEY = config('SECRET_KEY')
+
+# Choix de la base : local ou production
+USE_LOCAL_DB = config('USE_LOCAL_DB', default=True, cast=bool)
+
+if USE_LOCAL_DB:
     DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': env.db("DB_NAME", default="nitypulse_db"),
-                'USER': env.db("DB_USER", default="postgres"),
-                'PASSWORD': env.db("DB_PASSWORD", default="postgres"),
-                'HOST': env.db("DB_HOST", default="127.0.0.1"),
-                'PORT': env.db("DB_PORT", default="5432"),
-            }
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT', cast=int),
         }
-else:
-    DATABASES = {
-        "default": env.db(
-            "DATABASE_URL",
-             default="postgresql://melissa_user:748ay83dpwdITfLDVmULqqfyKynNc7YP@dpg-d3qucq8dl3ps73c87ic0-a.oregon-postgres.render.com/melissa"
-        )
     }
+else:
+    # Si tu veux utiliser DATABASE_URL pour la prod
+    DATABASES = {
+        'default': dj_database_url.parse(config('DATABASE_URL'))
+    }
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # URLS
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
@@ -200,12 +203,14 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 X_FRAME_OPTIONS = "DENY"
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Hôte SMTP pour Gmail
+EEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER='fotsoeddysteve@gmail.com'
-EMAIL_HOST_PASSWORD='iwpq qosi aalq pywo'
+EMAIL_USE_SSL = False      # ← Très important : False ou supprime la ligne
+EMAIL_HOST_USER = 'fotsoeddysteve@gmail.com'
+EMAIL_HOST_PASSWORD = 'iwpq qosi aalq pywo'
+DEFAULT_FROM_EMAIL = 'Fotso Eddy Steve <fotsoeddysteve@gmail.com>'
   # Mot de passe d'application Gmail
 # ADMIN
 # ------------------------------------------------------------------------------

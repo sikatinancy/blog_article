@@ -1,22 +1,25 @@
 # users/views/auth_views.py
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from django.contrib.auth.models import User
+from blog_articles.users.api.serializers import OTPVerifySerializer
+
+# CustomTokenObtainPairSerializer dépend de ton implémentation JWT, je le laisse inchangé
 from users.api.serializers import CustomTokenObtainPairSerializer
 
+User = get_user_model()
 
-# === PAGE LOGIN (GET) ===
+# Page login
 class LoginPageView(TemplateView):
     template_name = 'users/login.html'
 
 
-# === API LOGIN (POST) ===
+# API login
 class LoginAPIView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -33,21 +36,17 @@ class LoginAPIView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'Identifiants invalides.'}, status=401)
 
-        # Vérifier activation
         if not user.is_active:
             return Response({
-                'error': 'Compte non activé. Vérifiez votre email.'
+                'error': 'Compte non activé. Veuillez vérifier votre email et valider l’OTP.'
             }, status=401)
 
-        # Authentification
-        authenticated_user = authenticate(request, username=user.username, password=password)
+        authenticated_user = authenticate(request, username=user.username if hasattr(user, 'username') else user.email, password=password)
         if not authenticated_user:
             return Response({'error': 'Mot de passe incorrect.'}, status=401)
 
-        # Connexion
         login(request, authenticated_user)
 
-        # Générer token JWT
         token_serializer = CustomTokenObtainPairSerializer()
         token = token_serializer.get_token(authenticated_user)
 
@@ -56,15 +55,10 @@ class LoginAPIView(APIView):
             'refresh_token': str(token),
             'is_superuser': authenticated_user.is_superuser,
             'username': authenticated_user.username,
-            'profile_image': (
-                authenticated_user.profile.profile_image.url
-                if hasattr(authenticated_user, 'profile') and authenticated_user.profile.profile_image
-                else None
-            )
         }, status=200)
 
 
-# === LOGOUT ===
+# Logout
 class LogoutView(View):
     def get(self, request):
         logout(request)
