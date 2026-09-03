@@ -23,7 +23,7 @@ urlpatterns = [
     path('blog/', include(('blog_articles.blog.urls', 'blog'), namespace='blog')),
 
     # === AUTRES APPS ===
-    path('api/contact/', include('blog_articles.contact.urls')),
+    path('contact/', include('blog_articles.contact.urls')),
     path('newsletter/', include('blog_articles.newsletter.urls')),
 
     # === API DOCS ===

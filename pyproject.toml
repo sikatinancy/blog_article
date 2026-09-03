@@ -167,6 +167,7 @@ requires-python = "==3.13.*"
 dependencies = [
     "argon2-cffi==25.1.0",
     "celery==5.5.3",
+    "channels==4.2.2",
     "crispy-bootstrap5==2025.6",
     "django==5.2.7",
     "django-allauth[mfa]==65.12.0",
@@ -176,6 +177,7 @@ dependencies = [
     "django-crispy-forms==2.4",
     "django-environ==0.12.0",
     "django-model-utils==5.0.0",
+    "dj-database-url==2.3.0",
     "django-redis==6.0.0",
     "djangorestframework==3.16.1",
     "drf-spectacular==0.28.0",
@@ -184,6 +186,7 @@ dependencies = [
     "hiredis==3.2.1",
     "pillow==11.3.0",
     "psycopg[c]==3.2.10",
+    "python-decouple==3.8",
     "python-slugify==8.0.4",
     "redis==6.4.0",
     "whitenoise==6.11.0",

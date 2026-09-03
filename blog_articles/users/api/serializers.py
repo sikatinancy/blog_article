@@ -2,9 +2,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from blog_articles.users.models import Profile, OTP
-from blog_articles.users.utils import send_otp_email
-from django.utils import timezone
+from blog_articles.users.models import Profile
 import re
 
 
@@ -106,17 +104,6 @@ class SignupSerializer(serializers.ModelSerializer):
         profile.profile_image = profile_image
         profile.birth_date = birth_date
         profile.save()
-
-        # ------------------- CREATION OTP -------------------
-        otp = OTP.objects.create(
-            user=user,
-            verification_type=verification_type,
-            expires_at=timezone.now() + timezone.timedelta(minutes=10)
-        )
-        code = otp.generate_otp()
-
-        # ------------------- ENVOI EMAIL -------------------
-        send_otp_email(user.email, code)
 
         return user
 

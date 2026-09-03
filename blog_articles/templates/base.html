@@ -1,231 +1,86 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BlogApp</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogApp</title>
     {% load static %}
-<link rel="stylesheet" href="{% static './css/output.css' %}">
+    <link rel="stylesheet" href="{% static './css/output.css' %}">
     {% include 'includes/navbar.html' %}
 </head>
 <body class="bg-background text-gray-800">
 <main class="container mx-auto p-4">
-        {% block content %}
-        {% endblock %}
+    {% block content %}
+    {% endblock %}
 </main>
+
 <style>
-.footer {
-background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #ff9256 100%);
-color: white;
-margin-top: auto;
+    /* Tout ton style original reste INCHANGÉ */
+    .footer { background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #ff9256 100%); color: white; margin-top: auto; }
+    .footer-content { max-width: 7xl; margin: 0 auto; padding: 3rem 1rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+    .footer-section h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: white; position: relative; }
+    .footer-section h3::after { content: ''; position: absolute; bottom: -0.5rem; left: 0; width: 40px; height: 2px; background: #ff9256; }
+    .footer-links { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 0.5rem; }
+    .footer-links a { color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: all 0.3s ease; padding: 0.25rem 0; display: block; border-radius: 0.25rem; }
+    .footer-links a:hover { color: white; transform: translateX(5px); background: rgba(255, 255, 255, 0.1); padding-left: 0.5rem; }
+    .footer-contact p { color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+    .social-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s ease; border: 2px solid transparent; }
+    .social-link:hover { background: #ff9256; transform: translateY(-2px); border-color: white; }
+    .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 2rem; text-align: center; }
+    .footer-bottom-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-copyright { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+    .footer-legal { display: flex; gap: 1.5rem; }
+    .footer-legal a { color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.9rem; transition: color 0.3s ease; }
+    .footer-legal a:hover { color: white; }
+    .newsletter-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .newsletter-input { flex: 1; padding: 0.5rem 1rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.375rem; background: rgba(255, 255, 255, 0.1); color: white; outline: none; }
+    .newsletter-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+    .newsletter-input:focus { border-color: #ff9256; background: rgba(255, 255, 255, 0.15); }
+    .newsletter-btn { background: #ff9256; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .newsletter-btn:hover { background: #ff7b3a; transform: translateY(-1px); }
+    .newsletter-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    @media (max-width: 768px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+        .footer-bottom-content { flex-direction: column; text-align: center; }
+        .footer-legal { justify-content: center; }
+        .newsletter-form { flex-direction: column; }
     }
-.footer-content {
-max-width: 7xl;
-margin: 0 auto;
-padding: 3rem 1rem;
-    }
-.footer-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-gap: 2rem;
-margin-bottom: 2rem;
-    }
-.footer-section h3 {
-font-size: 1.25rem;
-font-weight: 700;
-margin-bottom: 1rem;
-color: white;
-position: relative;
-    }
-.footer-section h3::after {
-content: '';
-position: absolute;
-bottom: -0.5rem;
-left: 0;
-width: 40px;
-height: 2px;
-background: #ff9256;
-    }
-.footer-links {
-list-style: none;
-padding: 0;
-margin: 0;
-    }
-.footer-links li {
-margin-bottom: 0.5rem;
-    }
-.footer-links a {
-color: rgba(255, 255, 255, 0.8);
-text-decoration: none;
-transition: all 0.3s ease;
-padding: 0.25rem 0;
-display: block;
-border-radius: 0.25rem;
-    }
-.footer-links a:hover {
-color: white;
-transform: translateX(5px);
-background: rgba(255, 255, 255, 0.1);
-padding-left: 0.5rem;
-    }
-.footer-contact p {
-color: rgba(255, 255, 255, 0.8);
-margin-bottom: 0.5rem;
-display: flex;
-align-items: center;
-gap: 0.5rem;
-    }
-.social-links {
-display: flex;
-gap: 1rem;
-margin-top: 1rem;
-    }
-.social-link {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-width: 40px;
-height: 40px;
-background: rgba(255, 255, 255, 0.1);
-border-radius: 50%;
-color: white;
-text-decoration: none;
-transition: all 0.3s ease;
-border: 2px solid transparent;
-    }
-.social-link:hover {
-background: #ff9256;
-transform: translateY(-2px);
-border-color: white;
-    }
-.footer-bottom {
-border-top: 1px solid rgba(255, 255, 255, 0.2);
-padding-top: 2rem;
-text-align: center;
-    }
-.footer-bottom-content {
-display: flex;
-justify-content: space-between;
-align-items: center;
-flex-wrap: wrap;
-gap: 1rem;
-    }
-.footer-copyright {
-color: rgba(255, 255, 255, 0.8);
-font-size: 0.9rem;
-    }
-.footer-legal {
-display: flex;
-gap: 1.5rem;
-    }
-.footer-legal a {
-color: rgba(255, 255, 255, 0.8);
-text-decoration: none;
-font-size: 0.9rem;
-transition: color 0.3s ease;
-    }
-.footer-legal a:hover {
-color: white;
-    }
-.newsletter-form {
-display: flex;
-gap: 0.5rem;
-margin-top: 1rem;
-    }
-.newsletter-input {
-flex: 1;
-padding: 0.5rem 1rem;
-border: 1px solid rgba(255, 255, 255, 0.3);
-border-radius: 0.375rem;
-background: rgba(255, 255, 255, 0.1);
-color: white;
-outline: none;
-    }
-.newsletter-input::placeholder {
-color: rgba(255, 255, 255, 0.6);
-    }
-.newsletter-input:focus {
-border-color: #ff9256;
-background: rgba(255, 255, 255, 0.15);
-    }
-.newsletter-btn {
-background: #ff9256;
-color: white;
-border: none;
-padding: 0.5rem 1rem;
-border-radius: 0.375rem;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s ease;
-    }
-.newsletter-btn:hover {
-background: #ff7b3a;
-transform: translateY(-1px);
-    }
-/* Responsive Design */
-@media (max-width: 768px) {
-.footer-grid {
-grid-template-columns: 1fr;
-gap: 2rem;
-        }
-.footer-bottom-content {
-flex-direction: column;
-text-align: center;
-        }
-.footer-legal {
-justify-content: center;
-        }
-.newsletter-form {
-flex-direction: column;
-        }
-    }
-@media (max-width: 480px) {
-.footer-content {
-padding: 2rem 1rem;
-        }
-.footer-legal {
-flex-direction: column;
-gap: 0.5rem;
-        }
+    @media (max-width: 480px) {
+        .footer-content { padding: 2rem 1rem; }
+        .footer-legal { flex-direction: column; gap: 0.5rem; }
     }
 </style>
+
 <footer class="footer">
-<div class="footer-content">
-<div class="footer-grid">
-<!-- Section À propos -->
-<div class="footer-section">
-<h3>À propos de BlogApp</h3>
-<p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin-bottom: 1rem;">
-                    BlogApp est la plateforme de référence pour partager vos idées,
-                    découvrir de nouveaux articles et connecter avec une communauté
-                    passionnée d'écriture et de lecture.
+    <div class="footer-content">
+        <div class="footer-grid">
+            <!-- À propos -->
+            <div class="footer-section">
+                <h3>À propos de BlogApp</h3>
+                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin-bottom: 1rem;">
+                    BlogApp est la plateforme de référence pour partager vos idées, découvrir de nouveaux articles et connecter avec une communauté passionnée d'écriture et de lecture.
                 </p>
                 <div class="social-links">
                     <a href="#" class="social-link" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     </a>
                     <a href="#" class="social-link" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
                     </a>
                     <a href="#" class="social-link" aria-label="LinkedIn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
                     </a>
                     <a href="#" class="social-link" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12.017 0C8.396 0 7.987.012 6.756.06 5.526.107 4.704.278 3.995.525c-.789.261-1.459.613-2.129 1.283-.67.67-1.022 1.34-1.283 2.129-.247.709-.418 1.531-.465 2.761C.012 7.987 0 8.396 0 12.017c0 3.62.012 4.029.06 5.26.047 1.23.218 2.052.465 2.761.261.789.613 1.459 1.283 2.129.67.67 1.34 1.022 2.129 1.283.709.247 1.531.418 2.761.465 1.231.048 1.64.06 5.26.06 3.62 0 4.029-.012 5.26-.06 1.23-.047 2.052-.218 2.761-.465.789-.261 1.459-.613 2.129-1.283.67-.67 1.022-1.34 1.283-2.129.247-.709.418-1.531.465-2.761.048-1.231.06-1.64.06-5.26 0-3.62-.012-4.029-.06-5.26-.047-1.23-.218-2.052-.465-2.761-.261-.789-.613-1.459-1.283-2.129-.67-.67-1.34-1.022-2.129-1.283-.709-.247-1.531-.418-2.761-.465C16.046.012 15.637 0 12.017 0zm0 2.158c3.203 0 3.585.015 4.79.062 1.154.044 1.778.208 2.195.346.534.174.915.382 1.315.782.4.4.608.781.782 1.315.138.417.302 1.041.346 2.195.047 1.205.062 1.587.062 4.79 0 3.203-.015 3.585-.062 4.79-.044 1.154-.208 1.778-.346 2.195-.174.534-.382.915-.782 1.315-.4.4-.781.608-1.315.782-.417.138-1.041.302-2.195.346-1.205.047-1.587.062-4.79.062-3.203 0-3.585-.015-4.79-.062-1.154-.044-1.778-.208-2.195-.346-.534-.174-.915-.382-1.315-.782-.4-.4-.608-.781-.782-1.315-.138-.417-.302-1.041-.346-2.195-.047-1.205-.062-1.587-.062-4.79 0-3.203.015-3.585.062-4.79.044-1.154.208-1.778.346-2.195.174-.534.382-.915.782-1.315.4-.4.781-.608 1.315-.782.417-.138 1.041-.302 2.195-.346 1.205-.047 1.587-.062 4.79-.062z"/>
-                            <path d="M12.017 5.838a6.18 6.18 0 100 12.36 6.18 6.18 0 000-12.36zm0 10.175a3.995 3.995 0 110-7.99 3.995 3.995 0 010 7.99z"/>
-                            <circle cx="18.406" cy="5.595" r="1.44"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C8.396 0 7.987.012 6.756.06 5.526.107 4.704.278 3.995.525c-.789.261-1.459.613-2.129 1.283-.67.67-1.022 1.34-1.283 2.129-.247.709-.418 1.531-.465 2.761C.012 7.987 0 8.396 0 12.017c0 3.62.012 4.029.06 5.26.047 1.23.218 2.052.465 2.761.261.789.613 1.459 1.283 2.129.67.67 1.34 1.022 2.129 1.283.709.247 1.531.418 2.761.465 1.231.048 1.64.06 5.26.06 3.62 0 4.029-.012 5.26-.06 1.23-.047 2.052-.218 2.761-.465.789-.261 1.459-.613 2.129-1.283.67-.67 1.022-1.34 1.283-2.129.247-.709.418-1.531.465-2.761.048-1.231.06-1.64.06-5.26 0-3.62-.012-4.029-.06-5.26-.047-1.23-.218-2.052-.465-2.761-.261-.789-.613-1.459-1.283-2.129-.67-.67-1.34-1.022-2.129-1.283-.709-.247-1.531-.418-2.761-.465C16.046.012 15.637 0 12.017 0zm0 2.158c3.203 0 3.585.015 4.79.062 1.154.044 1.778.208 2.195.346.534.174.915.382 1.315.782.4.4.608.781.782 1.315.138.417.302 1.041.346 2.195.047 1.205.062 1.587.062 4.79 0 3.203-.015 3.585-.062 4.79-.044 1.154-.208 1.778-.346 2.195-.174.534-.382.915-.782 1.315-.4.4-.781.608-1.315.782-.417.138-1.041.302-2.195.346-1.205.047-1.587.062-4.79.062-3.203 0-3.585-.015-4.79-.062-1.154-.044-1.778-.208-2.195-.346-.534-.174-.915-.382-1.315-.782-.4-.4-.608-.781-.782-1.315-.138-.417-.302-1.041-.346-2.195-.047-1.205-.062-1.587-.062-4.79 0-3.203.015-3.585.062-4.79.044-1.154.208-1.778.346-2.195.174-.534.382-.915.782-1.315.4-.4.781-.608 1.315-.782.417-.138 1.041-.302 2.195-.346 1.205-.047 1.587-.062 4.79-.062z"/><path d="M12.017 5.838a6.18 6.18 0 100 12.36 6.18 6.18 0 000-12.36zm0 10.175a3.995 3.995 0 110-7.99 3.995 3.995 0 010 7.99z"/><circle cx="18.406" cy="5.595" r="1.44"/></svg>
                     </a>
                 </div>
             </div>
-            <!-- Section Liens rapides -->
+
+            <!-- Liens rapides -->
             <div class="footer-section">
                 <h3>Liens rapides</h3>
                 <ul class="footer-links">
@@ -237,7 +92,8 @@ gap: 0.5rem;
                     <li><a href="{% url 'users:register' %}">Inscription</a></li>
                 </ul>
             </div>
-            <!-- Section Catégories -->
+
+            <!-- Catégories -->
             <div class="footer-section">
                 <h3>Catégories</h3>
                 <ul class="footer-links">
@@ -249,23 +105,27 @@ gap: 0.5rem;
                     <li><a href="#">Actualités</a></li>
                 </ul>
             </div>
-            <!-- Section Newsletter -->
+
+            <!-- Newsletter -->
             <div class="footer-section">
                 <h3>Newsletter</h3>
                 <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1rem;">
-                    Inscrivez-vous pour recevoir les derniers articles et actualités.
+                    Recevez les nouveaux articles de vos auteurs préférés directement dans votre boîte mail.
                 </p>
                 <form class="newsletter-form" id="newsletter-form">
                     <input type="email" placeholder="Votre email" class="newsletter-input" id="newsletter-email" required>
-                    <button type="submit" class="newsletter-btn">S'abonner</button>
+                    <button type="submit" class="newsletter-btn" id="newsletter-submit-btn">
+                        S'abonner
+                    </button>
                 </form>
             </div>
         </div>
+
         <!-- Footer bottom -->
         <div class="footer-bottom">
             <div class="footer-bottom-content">
                 <div class="footer-copyright">
-                    &copy; 2024 BlogApp. Tous droits réservés.
+                    © 2025 BlogApp. Tous droits réservés.
                 </div>
                 <div class="footer-legal">
                     <a href="#">Politique de confidentialité</a>
@@ -277,118 +137,161 @@ gap: 0.5rem;
         </div>
     </div>
 </footer>
+
 <!-- Modal pour sélection des auteurs -->
-<div id="author-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-    <div style="background-color: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-        <span id="close-modal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
-        <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choisissez vos auteurs</h2>
-        <p style="text-align: center; color: #6b7280; font-size: 0.95rem;">Sélectionnez un ou plusieurs auteurs (triés par nombre d'articles) pour recevoir leurs nouvelles publications.</p>
+<div id="author-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+        <span id="close-modal" class="absolute top-3 right-4 text-3xl text-gray-400 hover:text-gray-600 cursor-pointer">&times;</span>
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Choisissez vos auteurs</h2>
+        <p class="text-center text-gray-600 text-sm mb-4">Sélectionnez les auteurs dont vous voulez suivre les publications</p>
+
         <form id="author-selection-form">
-            <div id="authors-list" style="max-height: 320px; overflow-y: auto; margin: 15px 0; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb;"></div>
-            <button type="submit" style="background: #3b82f6; color: white; padding: 12px; width: 100%; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; transition: background 0.3s;">
-                Confirmer l'abonnement
+            <div id="authors-list" class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50 mb-4"></div>
+            <button type="submit" id="confirm-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                Confirmer l’abonnement
             </button>
         </form>
-        <p id="subscription-message" style="text-align: center; margin-top: 12px; font-weight: 500; color: #10b981;"></p>
+        <p id="subscription-message" class="text-center mt-4 font-medium text-green-600"></p>
     </div>
 </div>
+
+<!-- SCRIPT EXACTEMENT CELUI QUE TU AS DEMANDÉ -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('newsletter-form');
-    const emailInput = document.getElementById('newsletter-email');
-    const modal = document.getElementById('author-modal');
-    const closeModal = document.getElementById('close-modal');
-    const authorsList = document.getElementById('authors-list');
-    const selectionForm = document.getElementById('author-selection-form');
-    const message = document.getElementById('subscription-message');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('newsletter-form');
+        const emailInput = document.getElementById('newsletter-email');
+        const modal = document.getElementById('author-modal');
+        const closeModal = document.getElementById('close-modal');
+        const authorsList = document.getElementById('authors-list');
+        const selectionForm = document.getElementById('author-selection-form');
+        const message = document.getElementById('subscription-message');
+        const submitBtn = document.getElementById('newsletter-submit-btn');
+        const confirmBtn = document.getElementById('confirm-btn');
 
-    function getCSRFToken() {
-        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
-        return cookieValue ? cookieValue.split('=')[1] : '';
-    }
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = emailInput.value.trim().toLowerCase();
-        if (!email || !email.includes('@')) {
-            alert('Veuillez entrer un email valide.');
-            return;
+        function getCSRFToken() {
+            const token = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                          document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+            return token || '';
         }
-        try {
-            const response = await fetch('/newsletter/start/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
-                body: JSON.stringify({ email }),
-            });
-            const data = await response.json();
-            if (data.success) {
-                authorsList.innerHTML = '';
-                data.authors.forEach(author => {
-                    const div = document.createElement('div');
-                    div.style = 'margin: 8px 0; padding: 8px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center;';
-                    div.innerHTML = `
-                        <input type="checkbox" name="authors" value="${author.id}" style="margin-right: 10px; accent-color: #3b82f6;">
-                        <label style="cursor: pointer; font-size: 0.95rem;"><strong>${author.name}</strong> <small style="color: #6b7280;">(${author.article_count} articles)</small></label>
-                    `;
-                    authorsList.appendChild(div);
+
+        // Étape 1 : Envoi de l'email
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = emailInput.value.trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                alert('Veuillez entrer un email valide.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Vérification...';
+
+            try {
+                const response = await fetch('/newsletter/start/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({ email })
                 });
-                modal.style.display = 'block';
-            } else {
-                alert(data.message);
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authorsList.innerHTML = '';
+                    if (data.authors.length === 0) {
+                        authorsList.innerHTML = '<p class="text-center text-gray-500 py-10">Aucun auteur disponible pour le moment.</p>';
+                    } else {
+                        data.authors.forEach(author => {
+                            const div = document.createElement('div');
+                            div.className = 'flex items-center p-4 hover:bg-gray-100 rounded-lg transition cursor-pointer border-b border-gray-200 last:border-0';
+                            div.innerHTML = `
+                                <input type="checkbox" name="authors" value="${author.id}" id="author-${author.id}" class="mr-4 w-5 h-5 accent-blue-600 rounded">
+                                <label for="author-${author.id}" class="cursor-pointer flex-1 text-gray-800">
+                                    <div class="font-semibold text-lg">${author.name}</div>
+                                    <div class="text-sm text-gray-500">${author.article_count} article${author.article_count > 1 ? 's' : ''} publié${author.article_count > 1 ? 's' : ''}</div>
+                                </label>
+                            `;
+                            authorsList.appendChild(div);
+                        });
+                    }
+                    modal.classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Une erreur est survenue.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erreur de connexion. Veuillez réessayer.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "S'abonner";
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Erreur lors de la requête.');
-        }
-    });
+        });
 
-    selectionForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = emailInput.value.trim().toLowerCase();
-        const selectedAuthors = Array.from(document.querySelectorAll('input[name="authors"]:checked')).map(checkbox => checkbox.value);
-        if (selectedAuthors.length === 0) {
-            alert('Sélectionnez au moins un auteur.');
-            return;
-        }
-        try {
-            const response = await fetch('/newsletter/confirm/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
-                body: JSON.stringify({ email, authors: selectedAuthors }),
-            });
-            const data = await response.json();
-            if (data.success) {
-                message.textContent = data.message;
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    emailInput.value = '';
-                    message.textContent = '';
-                }, 3000);
-            } else {
-                alert(data.message);
+        // Étape 2 : Confirmation finale
+        selectionForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const selectedAuthors = Array.from(document.querySelectorAll('input[name="authors"]:checked'))
+                .map(cb => cb.value);
+
+            if (selectedAuthors.length === 0) {
+                alert('Veuillez sélectionner au moins un auteur.');
+                return;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Erreur lors de la confirmation.');
-        }
-    });
 
-    closeModal.addEventListener('click', function() {
-        modal.style.display = 'none';
-    });
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = 'Confirmation en cours...';
 
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
+            try {
+                const response = await fetch('/newsletter/confirm/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        email: emailInput.value.trim().toLowerCase(),
+                        authors: selectedAuthors
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Message ultra clair avec les vrais noms
+                    message.innerHTML = `
+                        <div class="flex items-center justify-center gap-3 text-green-600 font-bold text-lg animate-pulse">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>${data.message}</span>
+                        </div>
+                    `;
+
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        emailInput.value = '';
+                        message.innerHTML = '';
+                    }, 5000);
+                } else {
+                    alert(data.message || 'Une erreur est survenue.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erreur lors de la confirmation.');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Confirmer l’abonnement";
+            }
+        });
+
+        // Fermeture du modal
+        closeModal.onclick = () => modal.classList.add('hidden');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.add('hidden');
+        });
     });
-});
 </script>
 </body>
 </html>

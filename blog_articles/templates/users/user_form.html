@@ -5,7 +5,7 @@
         {% if error %}
             <p class="text-red-500">{{ error }}</p>
         {% endif %}
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-4">
                 <label class="block text-gray-700">Nom d'utilisateur</label>
@@ -18,6 +18,10 @@
             <div class="mb-4">
                 <label class="block text-gray-700">Mot de passe</label>
                 <input type="password" name="password" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Photo de profil</label>
+                <input type="file" name="profile_image" accept="image/*" class="w-full p-2 border rounded">
             </div>
             <div class="flex space-x-2">
                 <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Enregistrer</button>

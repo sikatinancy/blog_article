@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center py-20">
+    <h1 class="text-5xl font-bold text-green-600 mb-6">Message envoyé !</h1>
+    <p class="text-xl text-gray-700 mb-8">
+        Merci pour votre message.<br>
+        Un e-mail de confirmation vous a été envoyé.
+    </p>
+    <a href="{% url 'home' %}" class="bg-accent text-white px-8 py-4 rounded-lg text-lg hover:bg-orange-700">
+        Retour à l'accueil
+    </a>
+</div>
+{% endblock %}

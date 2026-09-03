@@ -24,6 +24,10 @@
                 <input type="text" name="category" id="category" value="{{ article.category|default_if_none:'' }}" class="mt-1 block w-full p-2 border rounded" required>
             </div>
             <div class="mb-4">
+                <label for="price" class="block text-sm font-medium text-gray-700">Prix</label>
+                <input type="number" name="price" id="price" min="0" step="0.01" value="{{ article.price|default:'0.00' }}" class="mt-1 block w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
                 <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
                 <input type="file" name="image" id="image" class="mt-1 block w-full p-2 border rounded" accept="image/*">
                 {% if article.image %}

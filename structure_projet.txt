@@ -3758,3 +3758,10 @@
 
 485 directories, 3271 files
 
+
+
+
+
+
+j'aimerai que  au lieu que apres  authentification on envoie un  code otp dans la boite mail de l'utilisateur  qu'il devra entrer dans un formulaire q'on lui soummettra apres avoir  creer son compte avec succes  ou il mettra le code otp juste et n'ayant pas expire et apres avoir entre le code otp quand il soumet cela le renvoie a la page de connection ou il se connecte aiesement  voila pourquoi j'ai envoyer les vues du signup et login 
+voici la vue du register    biastetude26

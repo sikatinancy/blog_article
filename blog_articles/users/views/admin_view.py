@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
-from blog_articles.blog.models import Article, Comment
+from blog_articles.blog.models import Article, Comment, Order
 from blog_articles.contact.models import ContactMessage
 
 class AdminDashboardView(UserPassesTestMixin, TemplateView):
@@ -20,4 +20,6 @@ class AdminDashboardView(UserPassesTestMixin, TemplateView):
         context['article_count'] = Article.objects.count()
         context['comment_count'] = Comment.objects.count()
         context['message_count'] = ContactMessage.objects.count()
+        context['orders'] = Order.objects.select_related('user').prefetch_related('items').order_by('-created_at')
+        context['order_count'] = Order.objects.count()
         return context

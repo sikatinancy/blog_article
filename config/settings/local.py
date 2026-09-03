@@ -24,24 +24,58 @@ CACHES = {
         "LOCATION": "",
     },
 }
-
+# ==============================================================================
 # EMAIL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-# EMAIL_PORT = 1025
-# === EMAIL EN MODE CONSOLE (DÉVELOPPEMENT) ===
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# ==============================================================================
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Hôte SMTP pour Gmail
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER='fotsoeddysteve@gmail.com'
-EMAIL_HOST_PASSWORD='iwpq qosi aalq pywo'
-  # Mot de passe d'application Gmail
-# ADMIN
+# La configuration email est définie dans base.py
+# et récupérée depuis le fichier .env.
+
+# En développement local, on utilise SMTP Gmail.
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
+)
+
+EMAIL_HOST = env(
+    "EMAIL_HOST",
+    default="smtp.gmail.com",
+)
+
+EMAIL_PORT = env.int(
+    "EMAIL_PORT",
+    default=587,
+)
+
+EMAIL_USE_TLS = env.bool(
+    "EMAIL_USE_TLS",
+    default=True,
+)
+
+EMAIL_USE_SSL = env.bool(
+    "EMAIL_USE_SSL",
+    default=False,
+)
+
+EMAIL_HOST_USER = env(
+    "EMAIL_HOST_USER",
+    default="",
+)
+
+EMAIL_HOST_PASSWORD = env(
+    "EMAIL_HOST_PASSWORD",
+    default="",
+)
+
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default=EMAIL_HOST_USER,
+)
+
+SERVER_EMAIL = env(
+    "SERVER_EMAIL",
+    default=DEFAULT_FROM_EMAIL,
+)
 
 # WhiteNoise
 # ------------------------------------------------------------------------------

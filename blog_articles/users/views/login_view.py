@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from blog_articles.users.api.serializers import OTPVerifySerializer
 
 # CustomTokenObtainPairSerializer dépend de ton implémentation JWT, je le laisse inchangé
-from users.api.serializers import CustomTokenObtainPairSerializer
+from blog_articles.users.api.serializers import CustomTokenObtainPairSerializer
 
 User = get_user_model()
 

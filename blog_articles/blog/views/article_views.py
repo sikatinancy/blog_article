@@ -20,6 +20,7 @@ class ArticleCreateView(LoginRequiredMixin, TemplateView):
                 description=description,
                 content=content,
                 category=category,
+                price=request.POST.get('price') or 0,
                 image=image,
                 author=request.user,
                 published=published
@@ -44,6 +45,7 @@ class ArticleEditView(LoginRequiredMixin, TemplateView):
         article.description = request.POST.get('description')
         article.content = request.POST.get('content')
         article.category = request.POST.get('category')
+        article.price = request.POST.get('price') or 0
         article.published = request.POST.get('published') == 'on'
         if request.FILES.get('image'):
             article.image = request.FILES.get('image')
@@ -71,4 +73,5 @@ class ArticleDetailView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['article'] = Article.objects.get(id=self.kwargs['id'], published=True)
+        context['cart_item'] = context['article'].cart_items.filter(user=self.request.user).first()
         return context

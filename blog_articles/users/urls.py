@@ -1,15 +1,16 @@
 from django.urls import path
 from django.views.generic import TemplateView   # ← Ajoute cette ligne en haut si pas déjà présente
 
-from users.views.dashboard_views import DashboardView
-from users.views.home_view import HomeView
-from users.views.contact_view import ContactView
-from users.views.admin_view import AdminDashboardView
-from users.views.user_views import UserCreateView, UserEditView, UserDeleteView, UserDetailView
-from users.api.viewsets import UserListAPI
+from blog_articles.users.views.dashboard_views import DashboardView
+from blog_articles.users.views.home_view import HomeView
+from blog_articles.users.views.contact_view import ContactView
+from blog_articles.users.views.admin_view import AdminDashboardView
+from blog_articles.users.views.user_views import UserCreateView, UserEditView, UserDeleteView, UserDetailView
+from blog_articles.users.api.viewsets import UserListAPI
 from rest_framework_simplejwt.views import TokenRefreshView
-from users.views.login_view import LoginAPIView, LoginPageView, LogoutView
-from users.views.signup_view import SignupPageView, SignupAPIView, VerifyOTPView
+from blog_articles.users.views.login_view import LoginAPIView, LoginPageView, LogoutView
+from blog_articles.users.views.signup_view import SignupPageView, SignupAPIView, VerifyOTPView
+from blog_articles.users.views.profile_views import ProfileEditView
 
 app_name = 'users'
 
@@ -17,6 +18,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('register/', SignupPageView.as_view(), name='register'),
     path('login/', LoginPageView.as_view(), name='login'),
+    path('profile/edit/', ProfileEditView.as_view(), name='profile_edit'),
 
     # API
     path('api/register/', SignupAPIView.as_view(), name='register_api'),

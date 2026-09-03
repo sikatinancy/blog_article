@@ -164,6 +164,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
             else if (result.password) errorMsg = result.password[0];
             else if (result.password_confirm) errorMsg = result.password_confirm[0];
             else if (result.non_field_errors) errorMsg = result.non_field_errors[0];
+            else if (result.error) errorMsg = result.error;
             messageEl.innerHTML = `
                 <div class="flex items-center justify-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

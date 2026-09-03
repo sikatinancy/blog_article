@@ -1,30 +1,73 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-primary mb-4">{% if message %}Modifier{% else %}Créer{% endif %} un message</h2>
-        {% if error %}
-            <p class="text-red-500">{{ error }}</p>
+<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-primary mb-4">
+        {% if message %}Modifier{% else %}Créer{% endif %} un message
+    </h2>
+
+    <div id="alert"></div>
+
+    <form id="messageForm" data-id="{{ message.id|default:'' }}">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block text-gray-700">Sujet</label>
+            <input type="text" name="subject" value="{{ message.subject|default_if_none:'' }}"
+                   class="w-full p-2 border rounded" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Message</label>
+            <textarea name="message" class="w-full p-2 border rounded" rows="6" required>{{ message.message|default_if_none:'' }}</textarea>
+        </div>
+        {% if message %}
+        <div class="mb-4">
+            <label class="block text-gray-700">Lu</label>
+            <input type="checkbox" name="is_read" {% if message.is_read %}checked{% endif %}>
+        </div>
         {% endif %}
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-gray-700">Sujet</label>
-                <input type="text" name="subject" value="{{ message.subject|default_if_none:'' }}" class="w-full p-2 border rounded">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Message</label>
-                <textarea name="message" class="w-full p-2 border rounded">{{ message.message|default_if_none:'' }}</textarea>
-            </div>
-            {% if message %}
-                <div class="mb-4">
-                    <label class="block text-gray-700">Lu</label>
-                    <input type="checkbox" name="is_read" {% if message.is_read %}checked{% endif %}>
-                </div>
-            {% endif %}
-            <div class="flex space-x-2">
-                <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Enregistrer</button>
-                <a href="{% url 'users:admin_dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Annuler</a>
-            </div>
-        </form>
-    </div>
+        <div class="flex space-x-2">
+            <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">
+                Enregistrer
+            </button>
+            <a href="{% url 'users:admin_dashboard' %}" class="bg-gray-500 text-white p-2 rounded">
+                Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('messageForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    const id = e.target.dataset.id;
+    const isEdit = id !== '';
+
+    const url = isEdit ? `/api/contact/messages/${id}/` : '/api/contact/messages/';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const alert = document.getElementById('alert');
+    alert.innerHTML = '<p class="text-blue-600">Sauvegarde...</p>';
+
+    try {
+        const res = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            alert.innerHTML = '<p class="text-green-600">Enregistré !</p>';
+            setTimeout(() => location.href = "{% url 'users:admin_dashboard' %}", 1000);
+        } else {
+            alert.innerHTML = '<p class="text-red-600">Erreur.</p>';
+        }
+    } catch (err) {
+        alert.innerHTML = '<p class="text-red-600">Erreur réseau.</p>';
+    }
+};
+</script>
 {% endblock %}

@@ -148,6 +148,26 @@
             <p class="text-sm text-gray-600"><strong>Catégorie :</strong> {{ article.category }}</p>
             <p class="text-sm text-gray-600"><strong>Publié :</strong> {{ article.published|yesno:"Oui,Non" }}</p>
             <p class="text-sm text-gray-600"><strong>Créé le :</strong> {{ article.created_at|date:"d/m/Y H:i" }}</p>
+            <p class="text-sm text-gray-600"><strong>Prix :</strong> {{ article.price }}</p>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:24px 0;padding:20px;background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;">
+            <form method="post" action="{% if cart_item %}{% url 'blog:cart_remove' cart_item.id %}{% else %}{% url 'blog:cart_add' article.id %}{% endif %}" aria-label="Gestion du panier">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'blog:article_detail' article.id %}">
+                <button type="submit" style="background:{% if cart_item %}#dc2626{% else %}#16a34a{% endif %};color:#fff;border:0;border-radius:8px;padding:12px 20px;font-weight:700;font-size:16px;cursor:pointer;">
+                    {% if cart_item %}Retirer du panier{% else %}Ajouter au panier{% endif %}
+                </button>
+            </form>
+            {% if cart_item %}
+                <a href="{% url 'blog:checkout' %}" style="background:#2563eb;color:#fff;border-radius:8px;padding:12px 20px;font-weight:700;font-size:16px;text-decoration:none;display:inline-block;">
+                    Passer la commande
+                </a>
+            {% else %}
+                <a href="{% url 'blog:cart' %}" style="background:#64748b;color:#fff;border-radius:8px;padding:12px 20px;font-weight:700;font-size:16px;text-decoration:none;display:inline-block;">
+                    Voir le panier
+                </a>
+            {% endif %}
         </div>
 
         <!-- Boutons visibles et centrés -->

@@ -17,44 +17,39 @@
             --danger: #ef4444;
             --info: #3b82f6;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
         }
+        .user-container { display: flex; min-height: 100vh; }
 
-        .user-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 0;
-            box-shadow: 4px 0 20px rgba(30, 58, 138, 0.15);
+            box-shadow: 4px 0 20px rgba(30,58,138,0.15);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
             z-index: 1000;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
         .sidebar-header {
             padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
         }
-
         .sidebar-header h2 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -62,80 +57,206 @@
             align-items: center;
             gap: 0.75rem;
         }
-
-        .sidebar-header h2 i {
-            color: var(--accent);
-        }
+        .sidebar-header h2 i { color: var(--accent); }
 
         .nav-section {
             padding: 1.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
         }
-
         .nav-title {
             padding: 0 1.5rem 1rem;
-            font-size: 0.875rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
         }
-
-        .nav-links {
-            list-style: none;
-            padding: 0;
-        }
-
-        .nav-links li {
-            margin: 0.25rem 0;
-        }
-
+        .nav-links { list-style: none; padding: 0; }
+        .nav-links li { margin: 0.15rem 0; }
         .nav-links a {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.875rem 1.5rem;
-            color: rgba(255, 255, 255, 0.9);
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.85);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 0.9rem;
         }
-
         .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             color: white;
             border-left-color: var(--accent);
-            transform: translateX(5px);
+            transform: translateX(4px);
         }
-
-        .nav-links a i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
+        .nav-links a i { width: 18px; text-align: center; font-size: 1rem; }
         .nav-links a.active {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.15);
             color: white;
             border-left-color: var(--accent);
         }
+        .nav-links a .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            min-width: 18px;
+            text-align: center;
+        }
 
-        /* Main Content */
+        /* ===== MINI CHAT DANS SIDEBAR ===== */
+        .sidebar-chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            min-height: 0;
+        }
+        .sidebar-chat-header {
+            padding: 1rem 1.5rem 0.75rem;
+            flex-shrink: 0;
+        }
+        .sidebar-chat-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-chat-title a {
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            transition: opacity 0.2s;
+        }
+        .sidebar-chat-title a:hover { opacity: 0.8; }
+
+        .sidebar-chat-online {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem 0.75rem;
+            flex-shrink: 0;
+        }
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-online 2s infinite;
+        }
+        @keyframes pulse-online {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+        .online-text { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+        #sidebar-chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 120px;
+            max-height: 200px;
+        }
+        #sidebar-chat-box::-webkit-scrollbar { width: 3px; }
+        #sidebar-chat-box::-webkit-scrollbar-track { background: transparent; }
+        #sidebar-chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        .chat-msg {
+            max-width: 90%;
+            padding: 0.45rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            word-break: break-word;
+            animation: msgIn 0.25s ease;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-msg.sent {
+            background: var(--accent);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.received {
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.95);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .sidebar-chat-input-area {
+            padding: 0.75rem 1rem 1rem;
+            flex-shrink: 0;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        #sidebar-message-input {
+            flex: 1;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 0.5rem 0.875rem;
+            color: white;
+            font-size: 0.8rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        #sidebar-message-input::placeholder { color: rgba(255,255,255,0.45); }
+        #sidebar-message-input:focus {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.18);
+        }
+        .sidebar-send-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .sidebar-send-btn:hover { background: #e8813e; transform: scale(1.1); }
+
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
             margin-left: 280px;
             padding: 2rem;
             transition: all 0.3s ease;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
-
         .header h1 {
             font-size: 2rem;
             font-weight: 700;
@@ -145,23 +266,21 @@
             gap: 0.75rem;
         }
 
-        /* Profile Section */
+        /* ===== PROFILE ===== */
         .profile-section {
             background: white;
             border-radius: 1rem;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
         }
-
         .profile-header {
             display: flex;
             align-items: center;
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-
         .profile-avatar {
             width: 80px;
             height: 80px;
@@ -173,115 +292,78 @@
             color: white;
             font-size: 2rem;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+            box-shadow: 0 4px 12px rgba(30,58,138,0.3);
+            flex-shrink: 0;
         }
-
         .profile-info h2 {
             font-size: 1.75rem;
             font-weight: 700;
             color: var(--primary);
             margin-bottom: 0.25rem;
         }
+        .profile-info p { color: #64748b; font-size: 1rem; }
+        .profile-actions { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
 
-        .profile-info p {
-            color: #64748b;
-            font-size: 1rem;
-        }
-
-        .profile-actions {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Stats Cards */
+        /* ===== STATS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
-
         .stat-card {
             background: white;
             padding: 1.5rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
         }
-
         .stat-card.articles::before { background: linear-gradient(135deg, var(--success), #34d399); }
         .stat-card.comments::before { background: linear-gradient(135deg, var(--warning), #fbbf24); }
         .stat-card.likes::before { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
         .stat-card.views::before { background: linear-gradient(135deg, var(--info), #60a5fa); }
-
         .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem; font-size: 1.5rem;
         }
-
-        .stat-card.articles .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .stat-card.comments .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .stat-card.likes .stat-icon { background: rgba(30, 58, 138, 0.1); color: var(--primary); }
-        .stat-card.views .stat-icon { background: rgba(59, 130, 246, 0.1); color: var(--info); }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
+        .stat-card.articles .stat-icon { background: rgba(16,185,129,0.1); color: var(--success); }
+        .stat-card.comments .stat-icon { background: rgba(245,158,11,0.1); color: var(--warning); }
+        .stat-card.likes .stat-icon { background: rgba(30,58,138,0.1); color: var(--primary); }
+        .stat-card.views .stat-icon { background: rgba(59,130,246,0.1); color: var(--info); }
+        .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
         .stat-card.articles .stat-value { color: var(--success); }
         .stat-card.comments .stat-value { color: var(--warning); }
         .stat-card.likes .stat-value { color: var(--primary); }
         .stat-card.views .stat-value { color: var(--info); }
+        .stat-label { color: #64748b; font-weight: 600; font-size: 0.9rem; }
 
-        .stat-label {
-            color: #64748b;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        /* Content Sections */
+        /* ===== CONTENT SECTIONS ===== */
         .content-section {
             background: white;
             border-radius: 1rem;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
         }
-
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-
         .section-header h2 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -291,11 +373,8 @@
             gap: 0.5rem;
         }
 
-        /* DataTables Styles avec fond bleu et texte blanc */
-        .dataTables_wrapper {
-            margin-top: 1rem;
-        }
-
+        /* ===== DATATABLES ===== */
+        .dataTables_wrapper { margin-top: 1rem; }
         .dataTables_wrapper .dataTables_filter input {
             border: 1px solid var(--primary);
             border-radius: 0.5rem;
@@ -304,17 +383,12 @@
             background-color: var(--primary);
             color: white;
         }
-
-        .dataTables_wrapper .dataTables_filter input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
+        .dataTables_wrapper .dataTables_filter input::placeholder { color: rgba(255,255,255,0.7); }
         .dataTables_wrapper .dataTables_filter input:focus {
             outline: none;
             border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
-
         .dataTables_wrapper .dataTables_length select {
             border: 1px solid var(--primary);
             border-radius: 0.5rem;
@@ -323,7 +397,6 @@
             background-color: var(--primary);
             color: white;
         }
-
         .dataTables_wrapper .dataTables_paginate .paginate_button {
             border: 1px solid var(--primary);
             border-radius: 0.375rem;
@@ -332,25 +405,15 @@
             background-color: var(--primary);
             color: white !important;
         }
-
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
+            background: var(--secondary); color: white; border-color: var(--secondary);
         }
-
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
+            background: var(--secondary); color: white; border-color: var(--secondary);
         }
+        .dataTables_wrapper .dataTables_info { color: var(--primary); font-weight: 500; }
 
-        .dataTables_wrapper .dataTables_info {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        /* Action Buttons */
+        /* ===== BUTTONS ===== */
         .btn {
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
@@ -364,65 +427,34 @@
             align-items: center;
             gap: 0.5rem;
         }
+        .btn-view { background: var(--primary); color: white; }
+        .btn-edit { background: var(--accent); color: white; }
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: #6b7280; color: white; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
-        .btn-view {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-edit {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-accent {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-primary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Modal Styles */
+        /* ===== MODALS ===== */
         .modal-backdrop {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
         }
-
         .modal-panel {
             background: white;
             border-radius: 1rem;
             padding: 2rem;
             max-width: 500px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
         }
-
         .form-control {
             width: 100%;
             padding: 0.75rem;
@@ -431,14 +463,13 @@
             font-size: 1rem;
             transition: border-color 0.3s ease;
         }
-
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+            box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
         }
 
-        /* Mobile Menu Button */
+        /* ===== MOBILE ===== */
         .mobile-menu-btn {
             display: none;
             background: var(--primary);
@@ -450,677 +481,685 @@
             font-size: 1.25rem;
         }
 
-        /* Responsive Design */
         @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-menu-btn { display: block; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_filter {
-                text-align: left;
-                margin-bottom: 1rem;
-            }
-            
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .profile-actions {
-                flex-direction: column;
-            }
+            .main-content { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-actions { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="user-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>
-                    <i class="fas fa-user-circle"></i>
-                    Mon Espace
-                </h2>
-                <button class="close-sidebar" onclick="toggleSidebar()">
-                    <i class="fas fa-times"></i>
+<div class="user-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <i class="fas fa-user-circle"></i>
+                Mon Espace
+            </h2>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Navigation</div>
+            <ul class="nav-links">
+                <li><a href="#profile" class="active">
+                    <i class="fas fa-user"></i>Mon Profil
+                </a></li>
+                <li><a href="#articles">
+                    <i class="fas fa-newspaper"></i>Mes Articles
+                </a></li>
+                <li><a href="#comments">
+                    <i class="fas fa-comments"></i>Mes Commentaires
+                </a></li>
+                <li><a href="{% url 'contact:chat_room' %}">
+                    <i class="fas fa-comment-dots"></i>Messagerie
+                    <span class="badge">3</span>
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Actions</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="openCreateArticleModal(); return false;">
+                    <i class="fas fa-edit"></i>Créer un article
+                </a></li>
+                <li><a href="#" onclick="openCreateCommentModal(); return false;">
+                    <i class="fas fa-comment"></i>Ecrire un commentaire
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Compte</div>
+            <ul class="nav-links">
+                <li><a href="#">
+                    <i class="fas fa-cog"></i>Parametres
+                </a></li>
+                <li><a href="{% url 'users:logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>Deconnexion
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- MINI CHAT -->
+        <div class="sidebar-chat-section">
+            <div class="sidebar-chat-header">
+                <div class="sidebar-chat-title">
+                    <span><i class="fas fa-bolt" style="color:var(--accent);margin-right:0.4rem;font-size:0.7rem;"></i>Chat rapide</span>
+                    <a href="{% url 'contact:chat_room' %}">Ouvrir</a>
+                </div>
+            </div>
+            <div class="sidebar-chat-online">
+                <div class="online-dot"></div>
+                <span class="online-text">En ligne</span>
+            </div>
+            <div id="sidebar-chat-box">
+                <div class="chat-msg received">Bonjour ! Comment puis-je vous aider ?</div>
+            </div>
+            <div class="sidebar-chat-input-area">
+                <input type="text" id="sidebar-message-input" placeholder="Message...">
+                <button class="sidebar-send-btn" onclick="sidebarSendMessage()">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">Navigation</div>
-                <ul class="nav-links">
-                    <li><a href="#profile" class="active">
-                        <i class="fas fa-user"></i>
-                        Mon Profil
-                    </a></li>
-                    <li><a href="#articles">
-                        <i class="fas fa-newspaper"></i>
-                        Mes Articles
-                    </a></li>
-                    <li><a href="#comments">
-                        <i class="fas fa-comments"></i>
-                        Mes Commentaires
-                    </a></li>
-                </ul>
-            </div>
+        </div>
+    </aside>
 
-            <div class="nav-section">
-                <div class="nav-title">Actions</div>
-                <ul class="nav-links">
-                    <li><a href="#" onclick="openCreateArticleModal(); return false;">
-                        <i class="fas fa-edit"></i>
-                        Créer un article
-                    </a></li>
-                    <li><a href="#" onclick="openCreateCommentModal(); return false;">
-                        <i class="fas fa-comment"></i>
-                        Écrire un commentaire
-                    </a></li>
-                </ul>
-            </div>
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="header">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>
+                <i class="fas fa-tachometer-alt"></i>
+                Tableau de Bord Utilisateur
+            </h1>
+        </div>
 
-            <div class="nav-section">
-                <div class="nav-title">Compte</div>
-                <ul class="nav-links">
-                    <li><a href="#">
-                        <i class="fas fa-cog"></i>
-                        Paramètres
-                    </a></li>
-                    <li><a href="{% url 'users:logout' %}">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Déconnexion
-                    </a></li>
-                </ul>
+        <!-- Profile -->
+        <section id="profile" class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-full h-full rounded-full object-cover">
+                    {% else %}
+                        {{ user.username.0|upper }}
+                    {% endif %}
+                </div>
+                <div class="profile-info">
+                    <h2>Bienvenue, {{ user.username }} !</h2>
+                    <p>{{ user.email }}</p>
+                    <p class="text-sm text-gray-500">Membre depuis {{ user.date_joined|date:"F Y" }}</p>
+                </div>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
+            <div class="profile-actions">
+                <a class="btn btn-accent" href="{% url 'users:profile_edit' %}">
+                    <i class="fas fa-edit"></i>Modifier le profil
+                </a>
+                <button class="btn btn-primary">
+                    <i class="fas fa-cog"></i>Parametres
                 </button>
-                <h1>
-                    <i class="fas fa-tachometer-alt"></i>
-                    Tableau de Bord Utilisateur
-                </h1>
             </div>
+        </section>
 
-            <!-- Profile Section -->
-            <section id="profile" class="profile-section">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        {% if user.profile.profile_image %}
-                            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-full h-full rounded-full object-cover">
-                        {% else %}
-                            {{ user.username.0|upper }}
-                        {% endif %}
-                    </div>
-                    <div class="profile-info">
-                        <h2>Bienvenue, {{ user.username }} !</h2>
-                        <p>{{ user.email }}</p>
-                        <p class="text-sm text-gray-500">Membre depuis {{ user.date_joined|date:"F Y" }}</p>
-                    </div>
-                </div>
-                
-                <div class="profile-actions">
-                    <button class="btn btn-accent" onclick="openEditProfileModal()">
-                        <i class="fas fa-edit"></i>Modifier le profil
-                    </button>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-cog"></i>Paramètres
-                    </button>
-                </div>
-            </section>
+        <section class="content-section" id="orders">
+            <div class="section-header"><h2><i class="fas fa-shopping-basket"></i>Mon panier</h2><a class="btn btn-accent" href="{% url 'blog:cart' %}">Voir le panier ({{ cart_item_count }})</a></div>
+            {% if cart_items %}<p>{{ cart_item_count }} article(s) sélectionné(s).</p>{% else %}<p>Votre panier est vide.</p>{% endif %}
+        </section>
 
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card articles">
-                    <div class="stat-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <div class="stat-value">{{ article_count }}</div>
-                    <div class="stat-label">Articles publiés</div>
-                </div>
-                <div class="stat-card comments">
-                    <div class="stat-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="stat-value">{{ comment_count }}</div>
-                    <div class="stat-label">Commentaires</div>
-                </div>
-                <div class="stat-card likes">
-                    <div class="stat-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="stat-value">156</div>
-                    <div class="stat-label">J'aime reçus</div>
-                </div>
-                <div class="stat-card views">
-                    <div class="stat-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <div class="stat-value">2.4K</div>
-                    <div class="stat-label">Vues d'articles</div>
-                </div>
+        <section class="content-section">
+            <div class="section-header"><h2><i class="fas fa-truck"></i>Mes commandes</h2></div>
+            {% for order in orders %}<div class="border-b py-3">Commande #{{ order.id }} - {{ order.total }} - {{ order.get_status_display }} - {{ order.created_at|date:"d/m/Y H:i" }}</div>{% empty %}<p>Aucune commande.</p>{% endfor %}
+        </section>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card articles">
+                <div class="stat-icon"><i class="fas fa-newspaper"></i></div>
+                <div class="stat-value">{{ article_count }}</div>
+                <div class="stat-label">Articles publies</div>
             </div>
-
-            <!-- Articles Section avec DataTable -->
-            <section id="articles" class="content-section">
-                <div class="section-header">
-                    <h2>
-                        <i class="fas fa-newspaper"></i>
-                        Mes Articles ({{ article_count }})
-                    </h2>
-                </div>
-                <table id="articles-table" class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for article in articles %}
-                        <tr data-id="{{ article.id }}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.id }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ article.title }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.category|default:"Non catégorisé" }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if article.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
-                                    {% if article.published %}Publié{% else %}Brouillon{% endif %}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.created_at|date:"d/m/Y" }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.views|default:"0" }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <a href="{% url 'blog:article_detail' article.id %}" class="btn btn-view">
-                                        <i class="fas fa-eye"></i>Voir
-                                    </a>
-                                    <button class="btn btn-edit edit-article-btn"
-                                            data-id="{{ article.id }}"
-                                            data-title="{{ article.title|escapejs }}"
-                                            data-description="{{ article.description|escapejs }}"
-                                            data-content="{{ article.content|escapejs }}"
-                                            data-category="{{ article.category|default_if_none:''|escapejs }}"
-                                            data-published="{{ article.published|yesno:'true,false' }}"
-                                            data-image="{% if article.image %}{{ article.image.url|escapejs }}{% else %}''{% endif %}">
-                                        <i class="fas fa-edit"></i>Modifier
-                                    </button>
-                                    <button class="btn btn-delete delete-btn" data-id="{{ article.id }}" data-type="article">
-                                        <i class="fas fa-trash"></i>Supprimer
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-
-            <!-- Comments Section avec DataTable -->
-            <section id="comments" class="content-section">
-                <div class="section-header">
-                    <h2>
-                        <i class="fas fa-comments"></i>
-                        Mes Commentaires ({{ comment_count }})
-                    </h2>
-                </div>
-                <table id="comments-table" class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenu</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for comment in comments %}
-                        <tr data-id="{{ comment.id }}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.id }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">{{ comment.content|truncatewords:10 }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.article.title }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if comment.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
-                                    {% if comment.published %}Publié{% else %}Non publié{% endif %}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.created_at|date:"d/m/Y" }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <a href="{% url 'blog:comment_detail' comment.id %}" class="btn btn-view">
-                                        <i class="fas fa-eye"></i>Voir
-                                    </a>
-                                    <button class="btn btn-edit edit-comment-btn"
-                                            data-id="{{ comment.id }}"
-                                            data-content="{{ comment.content|escapejs }}"
-                                            data-article-id="{{ comment.article.id }}"
-                                            data-published="{{ comment.published|yesno:'true,false' }}">
-                                        <i class="fas fa-edit"></i>Modifier
-                                    </button>
-                                    <button class="btn btn-delete delete-btn" data-id="{{ comment.id }}" data-type="comment">
-                                        <i class="fas fa-trash"></i>Supprimer
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </section>
+            <div class="stat-card comments">
+                <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                <div class="stat-value">{{ comment_count }}</div>
+                <div class="stat-label">Commentaires</div>
+            </div>
+            <div class="stat-card likes">
+                <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                <div class="stat-value">156</div>
+                <div class="stat-label">J'aime recus</div>
+            </div>
+            <div class="stat-card views">
+                <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                <div class="stat-value">2.4K</div>
+                <div class="stat-label">Vues d'articles</div>
+            </div>
         </div>
-    </div>
 
-    <!-- Modals -->
-    <div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Créer un article</h3>
-            <form method="post" id="create-article-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-                    <input type="text" name="title" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" class="form-control" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                    <textarea name="content" class="form-control" rows="5" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-                    <input type="text" name="category" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                    <input type="file" name="image" accept="image/*" class="form-control">
-                </div>
-                <div class="mb-4 flex items-center">
-                    <input type="checkbox" name="published" id="published" class="h-4 w-4 text-primary">
-                    <label for="published" class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('create-article-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Créer</button>
-                </div>
-            </form>
+        <!-- Articles Table -->
+        <section id="articles" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-newspaper"></i>Mes Articles ({{ article_count }})</h2>
+            </div>
+            <table id="articles-table" class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorie</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for article in articles %}
+                    <tr data-id="{{ article.id }}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.id }}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ article.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.category|default:"Non categorise" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if article.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {% if article.published %}Publie{% else %}Brouillon{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.created_at|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ article.views|default:"0" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'blog:article_detail' article.id %}" class="btn btn-view">
+                                    <i class="fas fa-eye"></i>Voir
+                                </a>
+                                <button class="btn btn-edit edit-article-btn"
+                                        data-id="{{ article.id }}"
+                                        data-title="{{ article.title|escapejs }}"
+                                        data-description="{{ article.description|escapejs }}"
+                                        data-content="{{ article.content|escapejs }}"
+                                        data-category="{{ article.category|default_if_none:''|escapejs }}"
+                                        data-price="{{ article.price }}"
+                                        data-published="{{ article.published|yesno:'true,false' }}"
+                                        data-image="{% if article.image %}{{ article.image.url|escapejs }}{% else %}''{% endif %}">
+                                    <i class="fas fa-edit"></i>Modifier
+                                </button>
+                                <button class="btn btn-delete delete-btn" data-id="{{ article.id }}" data-type="article">
+                                    <i class="fas fa-trash"></i>Supprimer
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Comments Table -->
+        <section id="comments" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-comments"></i>Mes Commentaires ({{ comment_count }})</h2>
+            </div>
+            <table id="comments-table" class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenu</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for comment in comments %}
+                    <tr data-id="{{ comment.id }}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.id }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ comment.content|truncatewords:10 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.article.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if comment.published %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {% if comment.published %}Publie{% else %}Non publie{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comment.created_at|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'blog:comment_detail' comment.id %}" class="btn btn-view">
+                                    <i class="fas fa-eye"></i>Voir
+                                </a>
+                                <button class="btn btn-edit edit-comment-btn"
+                                        data-id="{{ comment.id }}"
+                                        data-content="{{ comment.content|escapejs }}"
+                                        data-article-id="{{ comment.article.id }}"
+                                        data-published="{{ comment.published|yesno:'true,false' }}">
+                                    <i class="fas fa-edit"></i>Modifier
+                                </button>
+                                <button class="btn btn-delete delete-btn" data-id="{{ comment.id }}" data-type="comment">
+                                    <i class="fas fa-trash"></i>Supprimer
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- Create Article -->
+<div id="create-article-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4" style="color:var(--primary);">
+            <i class="fas fa-plus-circle" style="color:var(--accent);margin-right:0.5rem;"></i>Creer un article
+        </h3>
+        <form method="post" id="create-article-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                <input type="text" name="title" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" class="form-control" rows="2" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" class="form-control" rows="5" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Categorie</label>
+                <input type="text" name="category" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prix</label>
+                <input type="number" name="price" min="0" step="0.01" value="0.00" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <input type="file" name="image" accept="image/*" class="form-control">
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="published" class="h-4 w-4">
+                <label for="published" class="ml-2 text-sm text-gray-700">Publier immediatement</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeModal('create-article-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-accent">Creer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Article -->
+<div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4" style="color:var(--primary);">
+            <i class="fas fa-edit" style="color:var(--accent);margin-right:0.5rem;"></i>Modifier l'article
+        </h3>
+        <form method="post" id="edit-article-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="edit-article-id">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                <input type="text" name="title" id="edit-title" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" id="edit-description" class="form-control" rows="2" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" id="edit-article-content" class="form-control" rows="5" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Categorie</label>
+                <input type="text" name="category" id="edit-category" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prix</label>
+                <input type="number" name="price" id="edit-price" min="0" step="0.01" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <input type="file" name="image" id="edit-image" accept="image/*" class="form-control">
+                <p id="current-image" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="edit-article-published" class="h-4 w-4">
+                <label for="edit-article-published" class="ml-2 text-sm text-gray-700">Publie</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeModal('edit-article-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-accent">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Article -->
+<div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-sm w-full text-center">
+        <div style="width:60px;height:60px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i class="fas fa-trash" style="color:var(--danger);font-size:1.5rem;"></i>
         </div>
+        <h3 class="text-xl font-bold mb-2">Supprimer l'article ?</h3>
+        <p class="text-gray-600 mb-6">Cette action est irreversible.</p>
+        <form method="post" id="delete-article-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="delete-article-id">
+            <div class="flex justify-center gap-3">
+                <button type="button" onclick="closeModal('delete-article-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div id="edit-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Modifier l'article</h3>
-            <form method="post" id="edit-article-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="edit-article-id">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-                    <input type="text" name="title" id="edit-title" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" id="edit-description" class="form-control" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                    <textarea name="content" id="edit-content" class="form-control" rows="5" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-                    <input type="text" name="category" id="edit-category" class="form-control" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                    <input type="file" name="image" id="edit-image" accept="image/*" class="form-control">
-                    <p id="current-image" class="text-sm text-gray-500 mt-1"></p>
-                </div>
-                <div class="mb-4 flex items-center">
-                    <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
-                    <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('edit-article-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Modifier</button>
-                </div>
-            </form>
+<!-- Create Comment -->
+<div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4" style="color:var(--primary);">
+            <i class="fas fa-comment-plus" style="color:var(--accent);margin-right:0.5rem;"></i>Ecrire un commentaire
+        </h3>
+        <form method="post" id="create-comment-form">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                <select name="article" class="form-control" required>
+                    {% for article in articles %}
+                    <option value="{{ article.id }}">{{ article.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" class="h-4 w-4">
+                <label class="ml-2 text-sm text-gray-700">Publier immediatement</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeModal('create-comment-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-accent">Creer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Comment -->
+<div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4" style="color:var(--primary);">
+            <i class="fas fa-edit" style="color:var(--accent);margin-right:0.5rem;"></i>Modifier le commentaire
+        </h3>
+        <form method="post" id="edit-comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="edit-comment-id">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                <textarea name="content" id="edit-comment-content" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
+                <select name="article" id="edit-comment-article" class="form-control" required>
+                    {% for article in articles %}
+                    <option value="{{ article.id }}">{{ article.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="published" id="edit-comment-published" class="h-4 w-4">
+                <label for="edit-comment-published" class="ml-2 text-sm text-gray-700">Publie</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeModal('edit-comment-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-accent">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Comment -->
+<div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop">
+    <div class="modal-panel max-w-sm w-full text-center">
+        <div style="width:60px;height:60px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i class="fas fa-trash" style="color:var(--danger);font-size:1.5rem;"></i>
         </div>
+        <h3 class="text-xl font-bold mb-2">Supprimer le commentaire ?</h3>
+        <p class="text-gray-600 mb-6">Cette action est irreversible.</p>
+        <form method="post" id="delete-comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="delete-comment-id">
+            <div class="flex justify-center gap-3">
+                <button type="button" onclick="closeModal('delete-comment-modal')" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div id="delete-article-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-sm w-full p-6 text-center">
-            <h3 class="text-xl font-bold mb-4">Supprimer l'article ?</h3>
-            <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
-            <form method="post" id="delete-article-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="delete-article-id">
-                <div class="flex justify-center gap-3">
-                    <button type="button" onclick="closeModal('delete-article-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-danger">Supprimer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="create-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Écrire un commentaire</h3>
-            <form method="post" id="create-comment-form">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                    <textarea name="content" class="form-control" rows="4" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
-                    <select name="article" class="form-control" required>
-                        {% for article in articles %}
-                        <option value="{{ article.id }}">{{ article.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4 flex items-center">
-                    <input type="checkbox" name="published" class="h-4 w-4 text-primary">
-                    <label class="ml-2 text-sm text-gray-700">Publier immédiatement</label>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('create-comment-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Créer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="edit-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-md w-full">
-            <h3 class="text-xl font-bold mb-4">Modifier le commentaire</h3>
-            <form method="post" id="edit-comment-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="edit-comment-id">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
-                    <textarea name="content" id="edit-content" class="form-control" rows="4" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Article</label>
-                    <select name="article" id="edit-article" class="form-control" required>
-                        {% for article in articles %}
-                        <option value="{{ article.id }}">{{ article.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4 flex items-center">
-                    <input type="checkbox" name="published" id="edit-published" class="h-4 w-4 text-primary">
-                    <label for="edit-published" class="ml-2 text-sm text-gray-700">Publié</label>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('edit-comment-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-accent">Modifier</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="delete-comment-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
-        <div class="modal-panel max-w-sm w-full p-6 text-center">
-            <h3 class="text-xl font-bold mb-4">Supprimer le commentaire ?</h3>
-            <p class="text-gray-600 mb-6">Cette action est irréversible.</p>
-            <form method="post" id="delete-comment-form">
-                {% csrf_token %}
-                <input type="hidden" name="id" id="delete-comment-id">
-                <div class="flex justify-center gap-3">
-                    <button type="button" onclick="closeModal('delete-comment-modal')" class="btn-primary">Annuler</button>
-                    <button type="submit" class="btn-danger">Supprimer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
-    <script>
-        // Initialisation des DataTables avec style bleu et texte blanc
-        $(document).ready(function() {
-            $('#articles-table').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
-                },
-                pageLength: 10,
-                responsive: true,
-                dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
-            });
-            
-            $('#comments-table').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
-                },
-                pageLength: 10,
-                responsive: true,
-                dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
-            });
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
+<script>
+    // DataTables
+    $(document).ready(function() {
+        $('#articles-table').DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
+            pageLength: 10,
+            responsive: true,
+            dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
         });
+        $('#comments-table').DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
+            pageLength: 10,
+            responsive: true,
+            dom: '<"flex justify-between items-center mb-4"<"flex items-center"l><"flex items-center"f>>rt<"flex justify-between items-center mt-4"<"flex items-center"i><"flex items-center"p>>'
+        });
+    });
 
-        // Récupérer le token CSRF
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') 
+        ? document.querySelector('[name=csrfmiddlewaretoken]').value 
+        : '';
 
-        // Sidebar toggle for mobile
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        }
+    // Sidebar toggle
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('active');
+    }
 
-        // Modal functions
-        function openCreateArticleModal() {
-            document.getElementById('create-article-modal').classList.remove('hidden');
-        }
+    // Modal helpers
+    function openCreateArticleModal() { document.getElementById('create-article-modal').classList.remove('hidden'); }
+    function openCreateCommentModal() { document.getElementById('create-comment-modal').classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function openCreateCommentModal() {
-            document.getElementById('create-comment-modal').classList.remove('hidden');
-        }
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        backdrop.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hidden');
+        });
+    });
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
+    // ===== ARTICLES =====
+    document.getElementById('create-article-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(this);
+        try {
+            const res = await fetch("{% url 'blog:article_create' %}", {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: data
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la creation de l article.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
 
-        // === ARTICLES ===
-        document.getElementById('create-article-form').addEventListener('submit', async function(e) {
+    document.querySelectorAll('.edit-article-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit-article-id').value = btn.dataset.id;
+            document.getElementById('edit-title').value = btn.dataset.title;
+            document.getElementById('edit-description').value = btn.dataset.description;
+            document.getElementById('edit-article-content').value = btn.dataset.content;
+            document.getElementById('edit-category').value = btn.dataset.category;
+            document.getElementById('edit-price').value = btn.dataset.price || '0.00';
+            document.getElementById('edit-article-published').checked = btn.dataset.published === 'true';
+            document.getElementById('current-image').innerHTML = btn.dataset.image && btn.dataset.image !== "''"
+                ? '<img src="' + btn.dataset.image + '" class="w-20 h-20 object-cover rounded mt-2">'
+                : 'Aucune image';
+            document.getElementById('edit-article-modal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-article-id').value;
+        const data = new FormData(this);
+        try {
+            const res = await fetch('/blog/articles/' + id + '/edit/', {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: data
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la modification.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
+
+    document.querySelectorAll('.delete-btn[data-type="article"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('delete-article-id').value = btn.dataset.id;
+            document.getElementById('delete-article-modal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('delete-article-id').value;
+        try {
+            const res = await fetch('/blog/articles/' + id + '/delete/', {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la suppression.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
+
+    // ===== COMMENTS =====
+    document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(this);
+        try {
+            const res = await fetch("{% url 'blog:comment_create' %}", {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: data
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la creation du commentaire.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
+
+    document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit-comment-id').value = btn.dataset.id;
+            document.getElementById('edit-comment-content').value = btn.dataset.content;
+            document.getElementById('edit-comment-article').value = btn.dataset.articleId;
+            document.getElementById('edit-comment-published').checked = btn.dataset.published === 'true';
+            document.getElementById('edit-comment-modal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-comment-id').value;
+        const data = new FormData(this);
+        try {
+            const res = await fetch('/blog/comment/' + id + '/edit/', {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: data
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la modification du commentaire.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
+
+    document.querySelectorAll('.delete-btn[data-type="comment"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('delete-comment-id').value = btn.dataset.id;
+            document.getElementById('delete-comment-modal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('delete-comment-id').value;
+        try {
+            const res = await fetch('/blog/comment/' + id + '/delete/', {
+                method: 'POST', headers: { 'X-CSRFToken': csrfToken }
+            });
+            if (res.ok) location.reload();
+            else alert('Erreur lors de la suppression.');
+        } catch(err) { alert('Erreur reseau.'); }
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            const data = new FormData(this);
-            try {
-                const res = await fetch("{% url 'blog:article_create' %}", {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken },
-                    body: data
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la création de l\'article.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+    });
 
-        // OUVRIR MODALE ÉDITION
-        document.querySelectorAll('.edit-article-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('edit-article-id').value = btn.dataset.id;
-                document.getElementById('edit-title').value = btn.dataset.title;
-                document.getElementById('edit-description').value = btn.dataset.description;
-                document.getElementById('edit-content').value = btn.dataset.content;
-                document.getElementById('edit-category').value = btn.dataset.category;
-                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
-                document.getElementById('current-image').innerHTML = btn.dataset.image
-                    ? `<img src="${btn.dataset.image}" class="w-20 h-20 object-cover rounded mt-2">`
-                    : 'Aucune image';
-                document.getElementById('edit-article-modal').classList.remove('hidden');
-            });
+    // Close sidebar on mobile nav click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 1024) toggleSidebar();
         });
+    });
 
-        // MODIFIER ARTICLE
-        document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-article-id').value;
-            const data = new FormData(this);
-            try {
-                const res = await fetch(`/blog/articles/${id}/edit/`, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken },
-                    body: data
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la modification.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
-        });
+    // ===== SIDEBAR MINI CHAT =====
+    const sidebarReplies = [
+        "Bien recu ! Je vous reponds des que possible.",
+        "Merci pour votre message !",
+        "Je prends note de votre demande.",
+        "Pouvez-vous preciser votre question ?",
+        "Je suis disponible pour vous aider."
+    ];
 
-        // SUPPRIMER ARTICLE
-        document.querySelectorAll('.delete-btn[data-type="article"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('delete-article-id').value = btn.dataset.id;
-                document.getElementById('delete-article-modal').classList.remove('hidden');
-            });
-        });
+    function sidebarSendMessage() {
+        const input = document.getElementById('sidebar-message-input');
+        const box = document.getElementById('sidebar-chat-box');
+        const text = input.value.trim();
+        if (!text) return;
 
-        document.getElementById('delete-article-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('delete-article-id').value;
-            try {
-                const res = await fetch(`/blog/articles/${id}/delete/`, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken }
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la suppression.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
-        });
+        // Message envoye
+        const sent = document.createElement('div');
+        sent.className = 'chat-msg sent';
+        sent.textContent = text;
+        box.appendChild(sent);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
 
-        // === COMMENTAIRES ===
-        document.getElementById('create-comment-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const data = new FormData(this);
-            try {
-                const res = await fetch("{% url 'blog:comment_create' %}", {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken },
-                    body: data
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la création du commentaire.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
-        });
+        // Reponse automatique
+        setTimeout(() => {
+            const reply = document.createElement('div');
+            reply.className = 'chat-msg received';
+            reply.textContent = sidebarReplies[Math.floor(Math.random() * sidebarReplies.length)];
+            box.appendChild(reply);
+            box.scrollTop = box.scrollHeight;
+        }, 900 + Math.random() * 600);
+    }
 
-        document.querySelectorAll('.edit-comment-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('edit-comment-id').value = btn.dataset.id;
-                document.getElementById('edit-content').value = btn.dataset.content;
-                document.getElementById('edit-article').value = btn.dataset.articleId;
-                document.getElementById('edit-published').checked = btn.dataset.published === 'true';
-                document.getElementById('edit-comment-modal').classList.remove('hidden');
-            });
-        });
-
-        document.getElementById('edit-comment-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-comment-id').value;
-            const data = new FormData(this);
-            try {
-                const res = await fetch(`/blog/comment/${id}/edit/`, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken },
-                    body: data
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la modification du commentaire.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
-        });
-
-        document.querySelectorAll('.delete-btn[data-type="comment"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('delete-comment-id').value = btn.dataset.id;
-                document.getElementById('delete-comment-modal').classList.remove('hidden');
-            });
-        });
-
-        document.getElementById('delete-comment-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('delete-comment-id').value;
-            try {
-                const res = await fetch(`/blog/comment/${id}/delete/`, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken }
-                });
-                if (res.ok) location.reload();
-                else alert('Erreur lors de la suppression du commentaire.');
-            } catch (err) {
-                alert('Erreur réseau.');
-            }
-        });
-
-        // Smooth scroll for navigation
-        document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Close sidebar when clicking on a link (mobile)
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 1024) {
-                    toggleSidebar();
-                }
-            });
-        });
-    </script>
+    document.getElementById('sidebar-message-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') sidebarSendMessage();
+    });
+</script>
 </body>
 </html>

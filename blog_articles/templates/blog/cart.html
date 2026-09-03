@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+	.cart-page { max-width: 1100px; margin: 0 auto; padding: 32px 16px 56px; }
+	.cart-heading { color: #1e3a8a; font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
+	.cart-subtitle { color: #64748b; margin-bottom: 26px; }
+	.cart-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 24px; align-items: start; }
+	.cart-list, .cart-summary, .cart-empty { background: #fff; border: 1px solid #dbe4f0; border-radius: 14px; box-shadow: 0 8px 24px rgba(30,58,138,.08); }
+	.cart-list { padding: 8px 22px; }
+	.cart-item { display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: 1px solid #e2e8f0; }
+	.cart-item:last-child { border-bottom: 0; }
+	.cart-image { width: 78px; height: 78px; object-fit: cover; border-radius: 10px; background: #e0e7ff; flex-shrink: 0; }
+	.cart-item-info { flex: 1; min-width: 0; }
+	.cart-item-title { color: #1e3a8a; font-weight: 800; margin-bottom: 5px; }
+	.cart-item-price { color: #64748b; font-size: .9rem; }
+	.cart-controls { display: flex; align-items: center; gap: 8px; }
+	.cart-quantity { min-width: 30px; text-align: center; color: #1e3a8a; font-weight: 800; }
+	.cart-control, .cart-remove { border: 0; border-radius: 7px; cursor: pointer; font-weight: 800; }
+	.cart-control { width: 32px; height: 32px; color: #fff; background: #2563eb; font-size: 18px; }
+	.cart-control:hover { background: #1e3a8a; }
+	.cart-remove { padding: 8px 10px; color: #b91c1c; background: #fee2e2; }
+	.cart-remove:hover { background: #fecaca; }
+	.cart-summary { padding: 24px; position: sticky; top: 96px; }
+	.cart-summary h2 { color: #1e3a8a; font-size: 1.25rem; font-weight: 800; margin-bottom: 20px; }
+	.cart-total { display: flex; justify-content: space-between; padding: 16px 0; border-top: 2px solid #2563eb; color: #1e3a8a; font-size: 1.3rem; font-weight: 800; }
+	.cart-checkout { display: block; text-align: center; background: #16a34a; color: #fff; padding: 14px 18px; border-radius: 9px; font-weight: 800; text-decoration: none; }
+	.cart-checkout:hover { background: #15803d; }
+	.cart-empty { padding: 42px 24px; text-align: center; }
+	.cart-empty h2 { color: #1e3a8a; font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+	.cart-empty p { color: #64748b; margin-bottom: 20px; }
+	.cart-browse { display: inline-block; padding: 12px 18px; background: #ff9256; color: #fff; border-radius: 8px; font-weight: 800; text-decoration: none; }
+	@media (max-width: 760px) { .cart-layout { grid-template-columns: 1fr; } .cart-summary { position: static; } .cart-item { flex-wrap: wrap; } .cart-remove { margin-left: 94px; } }
+</style>
+<div class="cart-page">
+	<h1 class="cart-heading">Mon panier</h1>
+	<p class="cart-subtitle">Retrouvez ici les articles que vous avez sélectionnés.</p>
+	{% if cart_items %}
+	<div class="cart-layout">
+		<section class="cart-list" aria-label="Articles du panier">
+			{% for item in cart_items %}
+			<article class="cart-item">
+				{% if item.article.image %}<img src="{{ item.article.image.url }}" class="cart-image" alt="{{ item.article.title }}">{% else %}<div class="cart-image"></div>{% endif %}
+				<div class="cart-item-info"><h2 class="cart-item-title">{{ item.article.title }}</h2><p class="cart-item-price">{{ item.article.price }} par article · Sous-total : {{ item.subtotal }}</p></div>
+				<div class="cart-controls">
+					<form method="post" action="{% url 'blog:cart_decrease' item.id %}">{% csrf_token %}<button class="cart-control" aria-label="Diminuer la quantité">−</button></form>
+					<span class="cart-quantity">{{ item.quantity }}</span>
+					<form method="post" action="{% url 'blog:cart_add' item.article.id %}"><input type="hidden" name="next" value="{% url 'blog:cart' %}">{% csrf_token %}<button class="cart-control" aria-label="Augmenter la quantité">+</button></form>
+				</div>
+				<form method="post" action="{% url 'blog:cart_remove' item.id %}">{% csrf_token %}<button class="cart-remove">Retirer</button></form>
+			</article>
+			{% endfor %}
+		</section>
+		<aside class="cart-summary">
+			<h2>Résumé</h2>
+			<div class="cart-total"><span>Total</span><span>{{ cart_total }}</span></div>
+			<a href="{% url 'blog:checkout' %}" class="cart-checkout">Passer la commande</a>
+		</aside>
+	</div>
+	{% else %}
+	<section class="cart-empty"><h2>Votre panier est vide</h2><p>Explorez les articles et ajoutez vos favoris ici.</p><a href="{% url 'users:home' %}" class="cart-browse">Découvrir les articles</a></section>
+	{% endif %}
+</div>
+{% endblock %}

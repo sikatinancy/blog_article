@@ -2,8 +2,8 @@
 from django.views.generic import TemplateView
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from django.db import transaction
 from django.utils import timezone
-from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,9 +11,17 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 from blog_articles.users.api.serializers import SignupSerializer, OTPVerifySerializer
 from blog_articles.users.models import OTP
-from blog_articles.users.utils import send_otp_email, send_otp_phone
+from blog_articles.users.utils import OTPEmailDeliveryError, send_otp_email
 
 User = get_user_model()
+
+
+def issue_email_otp(user):
+    """Remplace les anciens codes par un unique code utilisable pendant 15 min."""
+    OTP.objects.filter(user=user, verification_type="email").delete()
+    otp = OTP(user=user, verification_type="email")
+    code = otp.generate_otp(length=6, expiry_minutes=15)
+    send_otp_email(user.email, code)
 
 
 class SignupPageView(TemplateView):
@@ -25,35 +33,32 @@ class SignupAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        # Un compte créé lors d'un incident SMTP peut demander un nouveau code.
+        email = request.data.get("email", "").strip().lower()
+        existing_user = User.objects.filter(email__iexact=email, is_active=False).first()
+        if existing_user:
+            try:
+                with transaction.atomic():
+                    issue_email_otp(existing_user)
+            except OTPEmailDeliveryError as exc:
+                return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({
+                "success": True,
+                "message": "Un nouveau code OTP a été envoyé.",
+                "redirect_to": f"/users/verify-otp/?identifier={existing_user.email}",
+            })
+
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
 
-            # Vérification unicité email / phone
-            if User.objects.filter(email=data['email']).exists():
-                return Response({'error': 'Cet email est déjà utilisé'}, status=status.HTTP_400_BAD_REQUEST)
-            if data.get('phone') and User.objects.filter(phone=data['phone']).exists():
-                return Response({'error': 'Ce numéro est déjà utilisé'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Création utilisateur inactif
-            user = serializer.save()
-
-            # Type de vérification (email par défaut)
-            verification_type = data.get('verification_type', 'email').lower()
-
-            # Création OTP
-            otp = OTP.objects.create(
-                user=user,
-                verification_type=verification_type,
-                expires_at=timezone.now() + timedelta(minutes=15)
-            )
-            code = otp.generate_otp(length=6, expiry_minutes=15)
-
-            # Envoi OTP
-            if verification_type == 'email':
-                send_otp_email(user.email, code)
-            else:
-                send_otp_phone(user.phone, code)
+            try:
+                # Si SMTP échoue, toute l'inscription est annulée : aucun compte bloqué.
+                with transaction.atomic():
+                    user = serializer.save()
+                    issue_email_otp(user)
+            except OTPEmailDeliveryError as exc:
+                return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
             # REDIRECTION DIRECTE VERS LA PAGE OTP AVEC EMAIL PRÉ-REMPLI
             return Response({
@@ -74,8 +79,8 @@ class VerifyOTPView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        identifier = serializer.validated_data['identifier']
-        code = serializer.validated_data['code']
+        identifier = serializer.validated_data['identifier'].strip().lower()
+        code = serializer.validated_data['code'].strip()
 
         # Recherche user par email ou phone
         user = User.objects.filter(email=identifier).first() or User.objects.filter(phone=identifier).first()
@@ -83,7 +88,11 @@ class VerifyOTPView(APIView):
             return Response({'error': 'Utilisateur non trouvé'}, status=status.HTTP_404_NOT_FOUND)
 
         # Trouver OTP valide
-        otp_qs = OTP.objects.filter(user=user, code=code).order_by('-created_at')
+        otp_qs = OTP.objects.filter(
+            user=user,
+            verification_type='email',
+            code=code,
+        ).order_by('-created_at')
         otp = otp_qs.first()
 
         if not otp:
@@ -91,17 +100,11 @@ class VerifyOTPView(APIView):
 
         if not otp.is_valid():
             # Code expiré → on en génère un nouveau automatiquement
-            new_otp = OTP.objects.create(
-                user=user,
-                verification_type=otp.verification_type,
-                expires_at=timezone.now() + timedelta(minutes=15)
-            )
-            new_code = new_otp.generate_otp(length=6, expiry_minutes=15)
-
-            if new_otp.verification_type == 'email':
-                send_otp_email(user.email, new_code)
-            else:
-                send_otp_phone(user.phone, new_code)
+            try:
+                with transaction.atomic():
+                    issue_email_otp(user)
+            except OTPEmailDeliveryError as exc:
+                return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
             return Response({
                 'error': 'Code expiré. Un nouveau code a été envoyé.',

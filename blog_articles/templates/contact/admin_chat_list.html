@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversations - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #2563eb;
+            --accent: #ff9256;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 4px 0 20px rgba(30, 58, 138, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header h2 i {
+            color: var(--accent);
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-title {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0.25rem 0;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: var(--accent);
+        }
+
+        .nav-links a.chat-link {
+            background: rgba(255, 146, 86, 0.15);
+            border-left-color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 146, 86, 0.3);
+        }
+
+        /* Conversation Cards */
+        .conversation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .conversation-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .conversation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+
+        .conversation-card .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .conversation-card .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .conversation-card .user-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .conversation-card .user-email {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .conversation-card .message-preview {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin: 0.5rem 0 1rem 0;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border-left: 3px solid var(--secondary);
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 0.75rem;
+        }
+
+        .conversation-card .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-unread {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-read {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-pending {
+            background: #fce4ec;
+            color: #c62828;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .conversation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <i class="fas fa-crown"></i>
+                    Super Admin
+                </h2>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Création</div>
+                <ul class="nav-links">
+                    <li><a href="{% url 'users:user_create' %}">
+                        <i class="fas fa-user-plus"></i>
+                        Créer un utilisateur
+                    </a></li>
+                    <li><a href="{% url 'blog:article_create' %}">
+                        <i class="fas fa-edit"></i>
+                        Créer un article
+                    </a></li>
+                    <li><a href="{% url 'blog:comment_create' %}">
+                        <i class="fas fa-comment"></i>
+                        Écrire un commentaire
+                    </a></li>
+                    <li><a href="{% url 'contact:message_create' %}">
+                        <i class="fas fa-envelope"></i>
+                        Envoyer un message
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Chat</div>
+                <ul class="nav-links">
+                    <li>
+                        <a href="{% url 'contact:admin_chat_list' %}" class="chat-link active">
+                            <i class="fas fa-comments"></i>
+                            Conversations utilisateurs
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Compte</div>
+                <ul class="nav-links">
+                    <li><a href="{% url 'users:logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Gestion</div>
+                <ul class="nav-links">
+                    <li><a href="/admin/">
+                        <i class="fas fa-users"></i>
+                        Liste des utilisateurs
+                    </a></li>
+                    <li><a href="/admin/">
+                        <i class="fas fa-newspaper"></i>
+                        Liste des articles
+                    </a></li>
+                    <li><a href="/admin/">
+                        <i class="fas fa-comments"></i>
+                        Liste des commentaires
+                    </a></li>
+                    <li><a href="/admin/">
+                        <i class="fas fa-inbox"></i>
+                        Messages
+                    </a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>
+                    <i class="fas fa-comments" style="color: var(--accent);"></i>
+                    Conversations utilisateurs
+                </h1>
+                <div class="header-actions">
+                    <span class="text-sm text-gray-500">
+                        <i class="fas fa-circle" style="color: var(--success); font-size: 0.5rem;"></i>
+                        {{ conversations|length }} conversation(s)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Conversations Grid -->
+            {% if conversations %}
+                <div class="conversation-grid">
+                    {% for conversation in conversations %}
+                        <a href="{% url 'contact:admin_chat_room' conversation.id %}" class="conversation-card" style="text-decoration: none;">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {{ conversation.user.username|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="user-name">{{ conversation.user.username }}</p>
+                                    <p class="user-email">{{ conversation.user.email }}</p>
+                                </div>
+                                <span class="badge {% if conversation.unread_count %}badge-unread{% else %}badge-read{% endif %}" style="margin-left: auto;">
+                                    {{ conversation.unread_count|default:0 }} non lu(s)
+                                </span>
+                            </div>
+                            
+                            <div class="message-preview">
+                                <i class="fas fa-quote-left" style="color: var(--secondary); font-size: 0.7rem; opacity: 0.5;"></i>
+                                {{ conversation.last_message|default:"Aucun message"|truncatewords:15 }}
+                            </div>
+                            
+                            <div class="meta">
+                                <span>
+                                    <i class="far fa-clock"></i>
+                                    {{ conversation.last_message_date|date:"d/m/Y H:i"|default:"-" }}
+                                </span>
+                                <span>
+                                    <i class="far fa-comment-dots"></i>
+                                    {{ conversation.total_messages }} messages
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-comment-slash"></i>
+                    <h3>Aucune conversation</h3>
+                    <p>Aucun utilisateur n'a encore envoyé de message.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        // Smooth navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.innerWidth <= 1024) {
+                    document.querySelector('.sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+	.checkout-page { max-width: 1080px; margin: 0 auto; padding: 32px 16px 56px; }
+	.checkout-heading { color: #1e3a8a; margin-bottom: 8px; font-size: 2rem; font-weight: 800; }
+	.checkout-subtitle { color: #64748b; margin-bottom: 28px; }
+	.checkout-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+	.checkout-panel { background: #fff; border: 1px solid #dbe4f0; border-radius: 14px; padding: 26px; box-shadow: 0 8px 24px rgba(30, 58, 138, .09); }
+	.checkout-panel h2 { color: #1e3a8a; font-size: 1.25rem; font-weight: 800; margin: 0 0 20px; }
+	.checkout-field { display: block; color: #334155; font-weight: 700; margin-bottom: 16px; }
+	.checkout-field input { display: block; width: 100%; margin-top: 7px; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+	.checkout-field input:focus { outline: 3px solid rgba(37, 99, 235, .15); border-color: #2563eb; }
+	.payment-box { margin: 22px 0; padding: 16px; background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 8px; }
+	.payment-box legend { color: #1e3a8a; font-weight: 800; margin-bottom: 10px; }
+	.payment-option { display: block; padding: 10px 0; color: #334155; }
+	.payment-option input { accent-color: #1e3a8a; margin-right: 8px; }
+	.payment-option.disabled { color: #94a3b8; }
+	.checkout-submit { width: 100%; border: 0; border-radius: 9px; padding: 15px 20px; background: #16a34a; color: #fff; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 12px rgba(22, 163, 74, .25); }
+	.checkout-submit:hover { background: #15803d; }
+	.order-item { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid #e2e8f0; }
+	.order-item:last-child { border-bottom: 0; }
+	.order-item-name { flex: 1; color: #334155; font-weight: 700; }
+	.order-item-price { color: #1e3a8a; font-weight: 800; white-space: nowrap; }
+	.checkout-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 18px; border-top: 2px solid #2563eb; color: #1e3a8a; font-size: 1.3rem; font-weight: 800; }
+	.checkout-alert { margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+	@media (max-width: 760px) { .checkout-grid { grid-template-columns: 1fr; } .checkout-page { padding-top: 20px; } }
+</style>
+
+<div class="checkout-page">
+	<h1 class="checkout-heading">Finaliser la commande</h1>
+	<p class="checkout-subtitle">Renseignez votre adresse de livraison et confirmez votre achat.</p>
+
+	{% for message in messages %}<div class="checkout-alert">{{ message }}</div>{% endfor %}
+
+	<div class="checkout-grid">
+		<section class="checkout-panel">
+			<h2>Adresse de livraison</h2>
+			<form method="post" id="checkout-form">
+				{% csrf_token %}
+				<label class="checkout-field" for="city">Ville
+					<input id="city" name="city" type="text" placeholder="Ex. Douala" required>
+				</label>
+				<label class="checkout-field" for="neighborhood">Quartier
+					<input id="neighborhood" name="neighborhood" type="text" placeholder="Ex. Bonanjo" required>
+				</label>
+				<label class="checkout-field" for="location">Lieu précis
+					<input id="location" name="location" type="text" placeholder="Rue, numéro ou point de repère" required>
+				</label>
+
+				<fieldset class="payment-box">
+					<legend>Mode de paiement</legend>
+					<label class="payment-option"><input type="radio" name="payment_method" value="cod" checked> Paiement à la livraison</label>
+					<label class="payment-option disabled"><input type="radio" name="payment_method" value="online" disabled> Paiement en ligne (bientôt disponible)</label>
+				</fieldset>
+
+				<button type="submit" class="checkout-submit">Commander définitivement</button>
+			</form>
+		</section>
+
+		<aside class="checkout-panel">
+			<h2>Résumé de la commande</h2>
+			{% for item in cart_items %}
+			<div class="order-item">
+				<span class="order-item-name">{{ item.article.title }} × {{ item.quantity }}</span>
+				<span class="order-item-price">{{ item.subtotal }}</span>
+			</div>
+			{% empty %}<p>Votre panier est vide.</p>{% endfor %}
+			<div class="checkout-total"><span>Total</span><span>{{ cart_total }}</span></div>
+		</aside>
+	</div>
+</div>
+{% endblock %}

@@ -40,6 +40,10 @@ class UserEditView(UserPassesTestMixin, TemplateView):
             user.set_password(request.POST.get('password'))
         try:
             user.save()
+            profile, _ = Profile.objects.get_or_create(user=user)
+            if request.FILES.get('profile_image'):
+                profile.profile_image = request.FILES['profile_image']
+                profile.save(update_fields=['profile_image'])
             return redirect('users:admin_dashboard')
         except Exception as e:
             return render(request, self.template_name, {'error': str(e), 'user': user})

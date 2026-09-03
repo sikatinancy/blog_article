@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+	.success-page { max-width: 720px; margin: 0 auto; padding: 54px 16px 80px; }
+	.success-card { background: #fff; border-top: 5px solid #16a34a; border-radius: 16px; padding: 44px 28px; text-align: center; box-shadow: 0 12px 30px rgba(30,58,138,.1); }
+	.success-icon { width: 76px; height: 76px; margin: 0 auto 22px; border-radius: 50%; background: #dcfce7; color: #15803d; display: grid; place-items: center; font-size: 42px; font-weight: 800; }
+	.success-title { color: #1e3a8a; font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+	.success-text { color: #64748b; font-size: 1.05rem; line-height: 1.6; }
+	.success-meta { display: inline-flex; gap: 14px; margin: 24px 0; padding: 10px 16px; background: #eff6ff; border-radius: 8px; color: #1e3a8a; font-weight: 700; }
+	.success-link { display: inline-block; padding: 13px 22px; border-radius: 8px; background: #2563eb; color: #fff; font-weight: 800; text-decoration: none; }
+	.success-link:hover { background: #1e3a8a; }
+</style>
+<div class="success-page"><section class="success-card"><div class="success-icon">✓</div><h1 class="success-title">Commande confirmée</h1><p class="success-text">Merci pour votre commande. Elle a bien été enregistrée et sera traitée par notre équipe.</p><div class="success-meta"><span>Commande #{{ order.id }}</span><span>{{ order.get_status_display }}</span></div><br><a href="{% url 'users:dashboard' %}" class="success-link">Voir mon dashboard</a></section></div>
+{% endblock %}

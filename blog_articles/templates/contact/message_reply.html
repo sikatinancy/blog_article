@@ -1,22 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-primary mb-4">Répondre au message</h2>
-        {% if error %}
-            <p class="text-red-500">{{ error }}</p>
-        {% endif %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-3xl font-bold text-primary mb-6">Répondre au message</h2>
+    <div class="bg-gray-50 p-6 rounded mb-6">
         <p><strong>Sujet :</strong> {{ message.subject }}</p>
-        <p><strong>Message :</strong> {{ message.message }}</p>
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-gray-700">Réponse</label>
-                <textarea name="reply" class="w-full p-2 border rounded">{{ message.reply|default_if_none:'' }}</textarea>
-            </div>
-            <div class="flex space-x-2">
-                <button type="submit" class="bg-accent text-white p-2 rounded hover:bg-orange-700">Envoyer</button>
-                <a href="{% url 'users:admin_dashboard' %}" class="bg-gray-500 text-white p-2 rounded">Annuler</a>
-            </div>
-        </form>
+        <p><strong>Message original :</strong></p>
+        <div class="mt-2 p-4 bg-white border rounded">{{ message.message|linebreaks }}</div>
     </div>
+
+    <div id="alert"></div>
+    <textarea id="replyText" rows="10" class="w-full p-4 border rounded-lg" placeholder="Votre réponse..."></textarea>
+    <button onclick="sendReply({{ message.id }})" class="mt-4 bg-accent text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700">
+        Envoyer la réponse par e-mail
+    </button>
+    <a href="{% url 'users:admin_dashboard' %}" class="ml-4 bg-gray-600 text-white px-8 py-4 rounded-lg">Retour</a>
+</div>
+
+<script>
+async function sendReply(id) {
+    const reply = document.getElementById('replyText').value.trim();
+    const alert = document.getElementById('alert');
+    if (!reply) return alert.innerHTML = '<p class="text-red-600">Écrivez une réponse.</p>';
+
+    alert.innerHTML = '<p class="text-blue-600">Envoi...</p>';
+
+    const res = await fetch(`/api/contact/messages/${id}/`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+        body: JSON.stringify({ reply })
+    });
+
+    if (res.ok) {
+        alert.innerHTML = '<p class="text-green-600">Réponse envoyée par e-mail !</p>';
+        setTimeout(() => location.href = "{% url 'users:admin_dashboard' %}", 1500);
+    } else {
+        alert.innerHTML = '<p class="text-red-600">Erreur.</p>';
+    }
+}
+</script>
 {% endblock %}

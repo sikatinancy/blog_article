@@ -44,7 +44,12 @@ class OTP(models.Model):
         """Génère le code OTP + expiration"""
         self.code = ''.join(random.choices('0123456789', k=length))
         self.expires_at = timezone.now() + timezone.timedelta(minutes=expiry_minutes)
-        self.save(update_fields=['code', 'expires_at'])
+
+        if self.pk is None:
+            self.save()
+        else:
+            self.save(update_fields=['code', 'expires_at'])
+
         return self.code
 
     def is_valid(self):

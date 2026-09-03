@@ -13,7 +13,9 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "blog_articles"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+# En local, charge .env automatiquement. En production, les variables du système
+# gardent la priorité sur ce fichier et peuvent donc remplacer toute valeur locale.
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
@@ -86,6 +88,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "drf_spectacular",
     "tailwind",  # ajout Tailwind CSS
+    "channels",
 ]
 LOCAL_APPS = [
       'blog_articles.blog',  # <-- ici, l'app contenant Article et Comment
@@ -184,6 +187,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "blog_articles.users.context_processors.allauth_settings",
+                "blog_articles.users.context_processors.cart_context",
             ],
         },
     },
@@ -203,15 +207,88 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 X_FRAME_OPTIONS = "DENY"
 
-EEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False      # ← Très important : False ou supprime la ligne
-EMAIL_HOST_USER = 'fotsoeddysteve@gmail.com'
-EMAIL_HOST_PASSWORD = 'iwpq qosi aalq pywo'
-DEFAULT_FROM_EMAIL = 'Fotso Eddy Steve <fotsoeddysteve@gmail.com>'
+# EEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False      # ← Très important : False ou supprime la ligne
+
+# EMAIL_HOST_USER = 'fotsoeddysteve@gmail.com'
+# EMAIL_HOST_PASSWORD = 'iwpqqosiaalqpywo'
+# DEFAULT_FROM_EMAIL = 'Fotso Eddy Steve <fotsoeddysteve@gmail.com>'
   # Mot de passe d'application Gmail
+
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+# ==============================================================================
+# EMAIL CONFIGURATION
+# ==============================================================================
+
+# Backend email
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
+)
+
+# Timeout SMTP
+EMAIL_TIMEOUT = 5
+
+
+# ------------------------------------------------------------------------------
+# Configuration SMTP
+# ------------------------------------------------------------------------------
+
+EMAIL_HOST = env(
+    "EMAIL_HOST",
+    default="smtp.gmail.com",
+)
+
+EMAIL_PORT = env.int(
+    "EMAIL_PORT",
+    default=587,
+)
+
+EMAIL_USE_TLS = env.bool(
+    "EMAIL_USE_TLS",
+    default=True,
+)
+
+EMAIL_USE_SSL = env.bool(
+    "EMAIL_USE_SSL",
+    default=False,
+)
+
+EMAIL_HOST_USER = env(
+    "EMAIL_HOST_USER",
+    default="",
+)
+
+EMAIL_HOST_PASSWORD = env(
+    "EMAIL_HOST_PASSWORD",
+    default="",
+)
+
+
+# ------------------------------------------------------------------------------
+# Adresse d'expédition
+# ------------------------------------------------------------------------------
+
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default=EMAIL_HOST_USER,
+)
+
+SERVER_EMAIL = env(
+    "SERVER_EMAIL",
+    default=DEFAULT_FROM_EMAIL,
+)
+
 # ADMIN
 # ------------------------------------------------------------------------------
 ADMIN_URL = "admin/"
@@ -241,7 +318,7 @@ LOGGING = {
 
 # REDIS & Celery
 # ------------------------------------------------------------------------------
-REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 REDIS_SSL = REDIS_URL.startswith("rediss://")
 
 if USE_TZ:
@@ -304,3 +381,12 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------------------
 TAILWIND_APP_NAME = "theme"
 INTERNAL_IPS = ["127.0.0.1"]
+
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

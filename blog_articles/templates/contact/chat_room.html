@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messagerie - BlogApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #2563eb;
+            --accent: #ff9256;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== LAYOUT ===== */
+        .page-container { display: flex; height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-header h2 i { color: var(--accent); }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        .nav-title {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+        }
+        .nav-links { list-style: none; padding: 0; }
+        .nav-links li { margin: 0.15rem 0; }
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--accent);
+            transform: translateX(4px);
+        }
+        .nav-links a i { width: 18px; text-align: center; font-size: 1rem; }
+        .nav-links a.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: var(--accent);
+        }
+        .nav-links a .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+        }
+
+        /* ===== MINI CHAT SIDEBAR ===== */
+        .sidebar-chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            min-height: 0;
+        }
+        .sidebar-chat-header { padding: 1rem 1.5rem 0.75rem; flex-shrink: 0; }
+        .sidebar-chat-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-chat-title a {
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+        .sidebar-chat-online {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1.5rem 0.75rem; flex-shrink: 0;
+        }
+        .online-dot {
+            width: 7px; height: 7px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-online 2s infinite;
+        }
+        @keyframes pulse-online {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+        .online-text { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+        #sidebar-chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 80px;
+            max-height: 160px;
+        }
+        #sidebar-chat-box::-webkit-scrollbar { width: 3px; }
+        #sidebar-chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        .sidebar-msg {
+            max-width: 92%;
+            padding: 0.4rem 0.7rem;
+            border-radius: 10px;
+            font-size: 0.76rem;
+            line-height: 1.4;
+            animation: msgIn 0.2s ease;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sidebar-msg.sent { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 3px; }
+        .sidebar-msg.received { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.95); align-self: flex-start; border-bottom-left-radius: 3px; }
+
+        .sidebar-chat-input-area {
+            padding: 0.75rem 1rem 1rem;
+            flex-shrink: 0;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        #sidebar-message-input {
+            flex: 1;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 0.45rem 0.875rem;
+            color: white;
+            font-size: 0.78rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        #sidebar-message-input::placeholder { color: rgba(255,255,255,0.45); }
+        #sidebar-message-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.18); }
+        .sidebar-send-btn {
+            width: 30px; height: 30px;
+            background: var(--accent);
+            border: none; border-radius: 50%;
+            color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+        .sidebar-send-btn:hover { background: #e8813e; transform: scale(1.1); }
+
+        /* ===== MAIN CHAT AREA ===== */
+        .main-chat {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== CONTACTS PANEL ===== */
+        .contacts-panel {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .contacts-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            background: white;
+        }
+        .contacts-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            outline: none;
+            background: #f8fafc;
+            transition: all 0.2s;
+            color: #374151;
+        }
+        .search-box input:focus { border-color: var(--secondary); background: white; }
+        .search-box i {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .contacts-list { flex: 1; overflow-y: auto; }
+        .contacts-list::-webkit-scrollbar { width: 4px; }
+        .contacts-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        .contact-item:hover { background: #f8fafc; }
+        .contact-item.active {
+            background: #eff6ff;
+            border-left-color: var(--secondary);
+        }
+        .contact-item + .contact-item { border-top: 1px solid #f1f5f9; }
+
+        .contact-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .contact-avatar.c1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .contact-avatar.c2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .contact-avatar.c3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .contact-avatar.c4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .contact-avatar.c5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+        .status-indicator {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            bottom: 1px; right: 1px;
+        }
+        .status-indicator.online { background: var(--success); }
+        .status-indicator.away { background: var(--warning); }
+        .status-indicator.offline { background: #94a3b8; }
+
+        .contact-info { flex: 1; min-width: 0; }
+        .contact-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .contact-preview {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .contact-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+        .contact-time { font-size: 0.7rem; color: #94a3b8; }
+        .unread-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* ===== CHAT WINDOW ===== */
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .chat-topbar {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .chat-topbar-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .chat-topbar-info { flex: 1; }
+        .chat-topbar-name { font-weight: 700; color: #1e293b; font-size: 1rem; }
+        .chat-topbar-status { font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.3rem; }
+        .chat-topbar-status::before {
+            content: '';
+            display: inline-block;
+            width: 6px; height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+        .chat-topbar-actions { display: flex; gap: 0.5rem; }
+        .topbar-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .topbar-btn:hover { background: #e2e8f0; color: var(--primary); }
+
+        /* ===== MESSAGES ===== */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+        .date-separator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.75rem 0;
+        }
+        .date-separator::before,
+        .date-separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .date-separator span {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .message-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .message-group.outgoing { align-items: flex-end; }
+        .message-group.incoming { align-items: flex-start; }
+
+        .msg-sender-name {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+            padding: 0 0.5rem;
+        }
+
+        .message-bubble {
+            max-width: 68%;
+            padding: 0.7rem 1rem;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-word;
+            position: relative;
+            animation: bubbleIn 0.2s ease;
+        }
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .message-bubble.outgoing {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .message-bubble.incoming {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.2rem;
+            padding: 0 0.3rem;
+        }
+        .msg-time { font-size: 0.68rem; color: #94a3b8; }
+        .msg-read { font-size: 0.68rem; color: var(--secondary); }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.6rem 1rem;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .typing-dot {
+            width: 7px; height: 7px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+        .input-actions-left { display: flex; gap: 0.4rem; }
+        .input-action-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .input-action-btn:hover { background: #e2e8f0; color: var(--primary); }
+
+        .message-input-wrap {
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+        .message-input-wrap:focus-within { border-color: var(--secondary); background: white; }
+        #message-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            color: #1e293b;
+            resize: none;
+            min-height: 22px;
+            max-height: 100px;
+            line-height: 1.5;
+            font-family: inherit;
+        }
+        #message-input::placeholder { color: #94a3b8; }
+
+        .send-btn {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(30,58,138,0.3);
+        }
+        .send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(30,58,138,0.4); }
+        .send-btn:active { transform: scale(0.95); }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            padding: 2rem;
+        }
+        .empty-chat-icon {
+            width: 80px; height: 80px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+        .empty-chat h3 { font-size: 1.1rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem; }
+        .empty-chat p { font-size: 0.875rem; text-align: center; }
+
+        /* ===== MOBILE ===== */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-chat { margin-left: 0; }
+            .mobile-menu-btn { display: block; }
+        }
+        @media (max-width: 768px) {
+            .contacts-panel { width: 72px; }
+            .contact-info, .contact-meta { display: none; }
+            .contacts-header h2 span { display: none; }
+            .search-box { display: none; }
+            .contact-item { justify-content: center; padding: 1rem 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <i class="fas fa-user-circle"></i>
+                Mon Espace
+            </h2>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Navigation</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'users:dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i>Tableau de bord
+                </a></li>
+                <li><a href="{% url 'users:dashboard' %}#profile">
+                    <i class="fas fa-user"></i>Mon Profil
+                </a></li>
+                <li><a href="{% url 'users:dashboard' %}#articles">
+                    <i class="fas fa-newspaper"></i>Mes Articles
+                </a></li>
+                <li><a href="{% url 'users:dashboard' %}#comments">
+                    <i class="fas fa-comments"></i>Mes Commentaires
+                </a></li>
+                <li><a href="{% url 'contact:chat_room' %}" class="active">
+                    <i class="fas fa-comment-dots"></i>Messagerie
+                    <span class="badge">3</span>
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Actions</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'users:dashboard' %}">
+                    <i class="fas fa-edit"></i>Creer un article
+                </a></li>
+                <li><a href="{% url 'users:dashboard' %}">
+                    <i class="fas fa-comment"></i>Ecrire un commentaire
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Compte</div>
+            <ul class="nav-links">
+                <li><a href="#">
+                    <i class="fas fa-cog"></i>Parametres
+                </a></li>
+                <li><a href="{% url 'users:logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>Deconnexion
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- MINI CHAT SIDEBAR -->
+        <div class="sidebar-chat-section">
+            <div class="sidebar-chat-header">
+                <div class="sidebar-chat-title">
+                    <span><i class="fas fa-bolt" style="color:var(--accent);margin-right:0.4rem;font-size:0.7rem;"></i>Chat rapide</span>
+                    <a href="{% url 'contact:chat_room' %}">Plein ecran</a>
+                </div>
+            </div>
+            <div class="sidebar-chat-online">
+                <div class="online-dot"></div>
+                <span class="online-text">En ligne</span>
+            </div>
+            <div id="sidebar-chat-box">
+                <div class="sidebar-msg received">Bonjour ! Comment puis-je vous aider ?</div>
+            </div>
+            <div class="sidebar-chat-input-area">
+                <input type="text" id="sidebar-message-input" placeholder="Message...">
+                <button class="sidebar-send-btn" onclick="sidebarSendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CHAT ===== -->
+    <div class="main-chat">
+
+        <!-- Contacts -->
+        <div class="contacts-panel">
+            <div class="contacts-header">
+                <h2>
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="margin-right:0.5rem;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <i class="fas fa-comment-dots" style="color:var(--accent);"></i>
+                    <span>Messagerie</span>
+                </h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher..." oninput="filterContacts(this.value)">
+                </div>
+            </div>
+            <div class="contacts-list" id="contacts-list">
+
+                <!-- Contact Administration -->
+                <div class="contact-item active"
+                     onclick="openChat(
+                        this,
+                        'Administration',
+                        'c1',
+                        'AD',
+                        'online'
+                     )"
+                     data-name="administration">
+
+                    <div class="contact-avatar c1">
+                        AD
+                        <span class="status-indicator online"></span>
+                    </div>
+
+                    <div class="contact-info">
+                        <div class="contact-name">
+                            Administration
+                        </div>
+                        <div class="contact-preview">
+                            {% if messages %}
+                                Dernier message disponible
+                            {% else %}
+                                Aucun message
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="contact-meta">
+                        <span class="contact-time">
+                            {% if messages %}
+                                {{ messages.last.created_at|date:"H:i" }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="chat-window" id="chat-window">
+
+            <!-- Topbar -->
+            <div class="chat-topbar" id="chat-topbar">
+                <div class="chat-topbar-avatar" id="topbar-avatar">
+                    AD
+                </div>
+                <div class="chat-topbar-info">
+                    <div class="chat-topbar-name" id="topbar-name">
+                        Administration
+                    </div>
+                    <div class="chat-topbar-status" id="topbar-status">
+                        En ligne
+                    </div>
+                </div>
+                <div class="chat-topbar-actions">
+                    <button class="topbar-btn">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="topbar-btn">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="topbar-btn">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages-area" id="chat-box">
+                <div class="date-separator">
+                    <span>Aujourd'hui</span>
+                </div>
+
+                {% for message in messages %}
+                    {% if message.sender == request.user %}
+                        <!-- Message utilisateur -->
+                        <div class="message-group outgoing">
+                            <div class="message-bubble outgoing">
+                                {{ message.content }}
+                            </div>
+                            <div class="msg-meta">
+                                <span class="msg-time">
+                                    {{ message.created_at|date:"H:i" }}
+                                </span>
+                                <span class="msg-read">
+                                    <i class="fas fa-check-double"></i>
+                                </span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Message administration -->
+                        <div class="message-group incoming">
+                            <div class="msg-sender-name">
+                                {{ message.sender.username }}
+                            </div>
+                            <div class="message-bubble incoming">
+                                {{ message.content }}
+                            </div>
+                            <div class="msg-meta">
+                                <span class="msg-time">
+                                    {{ message.created_at|date:"H:i" }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <div class="empty-chat">
+                        <div class="empty-chat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Aucun message</h3>
+                        <p>Commencez votre discussion avec l'administration.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-actions-left">
+                    <button class="input-action-btn" title="Joindre un fichier">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="input-action-btn" title="Emoji">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                </div>
+
+                <div class="message-input-wrap">
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Ecrire un message..." 
+                        rows="1"></textarea>
+                </div>
+
+                <button class="send-btn" onclick="sendMessage()" id="main-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== TOGGLE SIDEBAR MOBILE =====
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('active');
+    }
+
+    // ===== OPEN CHAT =====
+    function openChat(el, name, colorClass, initials, status) {
+        document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        // Remove unread badge
+        const badge = el.querySelector('.unread-badge');
+        if (badge) badge.remove();
+
+        // Update topbar
+        const avatar = document.getElementById('topbar-avatar');
+        avatar.textContent = initials;
+        avatar.className = 'chat-topbar-avatar ' + colorClass;
+
+        document.getElementById('topbar-name').textContent = name;
+
+        const statusEl = document.getElementById('topbar-status');
+        if (status === 'online') {
+            statusEl.textContent = 'En ligne';
+            statusEl.style.color = 'var(--success)';
+        } else if (status === 'away') {
+            statusEl.textContent = 'Absent';
+            statusEl.style.color = 'var(--warning)';
+        } else {
+            statusEl.textContent = 'Hors ligne';
+            statusEl.style.color = '#94a3b8';
+        }
+
+        document.getElementById('message-input').focus();
+    }
+
+    // ===== APPEND MESSAGE =====
+    function appendMessage(text, type, time, senderName) {
+        const box = document.getElementById('chat-box');
+        const group = document.createElement('div');
+        group.className = 'message-group ' + type;
+
+        let html = '';
+        if (type === 'incoming') {
+            html += '<div class="msg-sender-name">' + senderName + '</div>';
+        }
+        html += '<div class="message-bubble ' + type + '">' + escapeHtml(text) + '</div>';
+        html += '<div class="msg-meta"><span class="msg-time">' + time + '</span>';
+        if (type === 'outgoing') {
+            html += '<span class="msg-read"><i class="fas fa-check-double"></i></span>';
+        }
+        html += '</div>';
+
+        group.innerHTML = html;
+        box.appendChild(group);
+        box.scrollTop = box.scrollHeight;
+        return group;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+
+    function getTime() {
+        const now = new Date();
+        return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    }
+
+    // ===== SEND MESSAGE =====
+    function sendMessage() {
+        const input = document.getElementById('message-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const topbarName = document.getElementById('topbar-name').textContent;
+        appendMessage(text, 'outgoing', getTime(), 'Moi');
+        input.value = '';
+        input.style.height = 'auto';
+
+        // Typing indicator
+        const box = document.getElementById('chat-box');
+        const typing = document.createElement('div');
+        typing.className = 'message-group incoming';
+        typing.id = 'typing-indicator';
+        typing.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+        box.appendChild(typing);
+        box.scrollTop = box.scrollHeight;
+
+        // Auto reply
+        const delay = 1000 + Math.random() * 1500;
+        setTimeout(() => {
+            const t = document.getElementById('typing-indicator');
+            if (t) t.remove();
+            const reply = "Merci pour votre message ! L'administration vous répondra dans les plus brefs délais.";
+            appendMessage(reply, 'incoming', getTime(), topbarName);
+        }, delay);
+    }
+
+    // Auto-resize textarea
+    document.getElementById('message-input').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    document.getElementById('message-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // ===== FILTER CONTACTS =====
+    function filterContacts(query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll('.contact-item').forEach(item => {
+            const name = item.getAttribute('data-name') || '';
+            item.style.display = name.includes(q) ? '' : 'none';
+        });
+    }
+
+    // ===== SIDEBAR MINI CHAT =====
+    const sidebarReplies = [
+        "Bien recu ! Je vous reponds bientot.",
+        "Merci pour votre message !",
+        "Je prends note.",
+        "Pouvez-vous preciser ?",
+        "Je suis la pour vous aider."
+    ];
+
+    function sidebarSendMessage() {
+        const input = document.getElementById('sidebar-message-input');
+        const box = document.getElementById('sidebar-chat-box');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const sent = document.createElement('div');
+        sent.className = 'sidebar-msg sent';
+        sent.textContent = text;
+        box.appendChild(sent);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        setTimeout(() => {
+            const reply = document.createElement('div');
+            reply.className = 'sidebar-msg received';
+            reply.textContent = sidebarReplies[Math.floor(Math.random() * sidebarReplies.length)];
+            box.appendChild(reply);
+            box.scrollTop = box.scrollHeight;
+        }, 900 + Math.random() * 700);
+    }
+
+    document.getElementById('sidebar-message-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') sidebarSendMessage();
+    });
+
+    // Scroll messages to bottom on load
+    document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+</script>
+</body>
+</html>

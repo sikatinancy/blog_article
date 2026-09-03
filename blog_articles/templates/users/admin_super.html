@@ -336,6 +336,27 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
+        /* Chat button in sidebar */
+        .nav-links a.chat-link {
+            background: rgba(255, 146, 86, 0.15);
+            border-left-color: var(--accent);
+            position: relative;
+        }
+
+        .nav-links a.chat-link::after {
+            content: '●';
+            position: absolute;
+            right: 1.5rem;
+            color: var(--accent);
+            font-size: 0.6rem;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
         /* Modal Styles */
         .modal-backdrop {
             background: rgba(0, 0, 0, 0.5);
@@ -491,7 +512,7 @@
             <div class="nav-section">
                 <div class="nav-title">Création</div>
                 <ul class="nav-links">
-                    <li><a href="{% url 'users:user_create' %}" class="active" onclick="openCreateUserModal(); return false;">
+                    <li><a href="{% url 'users:user_create' %}" onclick="openCreateUserModal(); return false;">
                         <i class="fas fa-user-plus"></i>
                         Créer un utilisateur
                     </a></li>
@@ -507,6 +528,19 @@
                         <i class="fas fa-envelope"></i>
                         Envoyer un message
                     </a></li>
+                </ul>
+            </div>
+
+            <!-- Nouvelle section Chat -->
+            <div class="nav-section">
+                <div class="nav-title">Chat</div>
+                <ul class="nav-links">
+                    <li>
+                        <a href="{% url 'contact:admin_chat_list' %}" class="chat-link">
+                            <i class="fas fa-comments"></i>
+                            Conversations utilisateurs
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -644,6 +678,18 @@
                 </table>
             </section>
 
+            <section class="content-section" id="orders">
+                <div class="section-header"><h2><i class="fas fa-shopping-basket"></i>Commandes ({{ order_count }})</h2></div>
+                {% for order in orders %}
+                <div class="border-b py-4 flex flex-wrap items-center gap-3">
+                    <div class="flex-1"><strong>#{{ order.id }} - {{ order.user.username }}</strong><br>{{ order.total }} - {{ order.city }}, {{ order.neighborhood }}, {{ order.location }} - {{ order.get_status_display }}</div>
+                    <form method="post" action="{% url 'blog:order_status' order.id 'cancelled' %}">{% csrf_token %}<button class="btn btn-delete">Annuler</button></form>
+                    <form method="post" action="{% url 'blog:order_status' order.id 'confirmed' %}">{% csrf_token %}<button class="btn btn-accent">Confirmer</button></form>
+                    <span class="btn btn-primary">En attente</span>
+                </div>
+                {% empty %}<p>Aucune commande.</p>{% endfor %}
+            </section>
+
             <!-- Articles Section avec DataTable -->
             <section id="articles" class="content-section">
                 <div class="section-header">
@@ -688,6 +734,7 @@
                                             data-description="{{ article.description|escapejs }}"
                                             data-content="{{ article.content|escapejs }}"
                                             data-category="{{ article.category|default_if_none:''|escapejs }}"
+                                            data-price="{{ article.price }}"
                                             data-published="{{ article.published|yesno:'true,false' }}"
                                             data-image="{% if article.image %}{{ article.image.url|escapejs }}{% else %}''{% endif %}">
                                         <i class="fas fa-edit"></i>Modifier
@@ -783,7 +830,9 @@
                         <tr data-id="{{ message.id }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ message.id }}</td>
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ message.subject }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ message.user.username|default:'Anonyme' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ message.user.username|default:message.email|default:'Anonyme' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if message.is_read %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
                                     {% if message.is_read %}Lu{% else %}Non lu{% endif %}
@@ -793,18 +842,21 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="{% url 'contact:message_detail' message.id %}" class="btn btn-view">
-                                        <i class="fas fa-eye"></i>Voir
+                                        <i class="fas fa-eye"></i> Voir
                                     </a>
+                                    <button type="button" onclick="openReplyModal({{ message.id }}, '{{ message.subject|escapejs }}', '{{ message.user.email|default:message.email|escapejs }}')" class="btn" style="background:#10b981;color:white;">
+                                        <i class="fas fa-reply"></i> Répondre
+                                    </button>
                                     <button class="btn btn-edit edit-message-btn"
                                             data-id="{{ message.id }}"
                                             data-subject="{{ message.subject|escapejs }}"
                                             data-message="{{ message.message|escapejs }}"
                                             data-user-id="{{ message.user.id|default_if_none:'' }}"
                                             data-is-read="{{ message.is_read|yesno:'true,false' }}">
-                                        <i class="fas fa-edit"></i>Modifier
+                                        <i class="fas fa-edit"></i> Modifier
                                     </button>
                                     <button class="btn btn-delete delete-btn" data-id="{{ message.id }}" data-type="message">
-                                        <i class="fas fa-trash"></i>Supprimer
+                                        <i class="fas fa-trash"></i> Supprimer
                                     </button>
                                 </div>
                             </td>
@@ -845,7 +897,7 @@
     <div id="edit-user-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
         <div class="modal-panel max-w-md w-full">
             <h3 class="text-xl font-bold mb-4">Modifier l'utilisateur</h3>
-            <form method="post" id="edit-user-form">
+            <form method="post" id="edit-user-form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="id" id="edit-user-id">
                 <div class="mb-4">
@@ -855,6 +907,10 @@
                 <div class="mb-4">
                     <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" name="email" id="edit-email" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-profile-image" class="block text-sm font-medium text-gray-700">Photo de profil</label>
+                    <input type="file" name="profile_image" id="edit-profile-image" accept="image/*" class="form-control">
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="btn-primary">Annuler</button>
@@ -901,6 +957,10 @@
                     <input type="text" name="category" id="create-category" class="form-control">
                 </div>
                 <div class="mb-4">
+                    <label for="create-price" class="block text-sm font-medium text-gray-700">Prix</label>
+                    <input type="number" name="price" id="create-price" min="0" step="0.01" value="0.00" class="form-control" required>
+                </div>
+                <div class="mb-4">
                     <label for="create-image" class="block text-sm font-medium text-gray-700">Image</label>
                     <input type="file" name="image" id="create-image" class="form-control" accept="image/*">
                 </div>
@@ -937,6 +997,10 @@
                 <div class="mb-4">
                     <label for="edit-category" class="block text-sm font-medium text-gray-700">Catégorie</label>
                     <input type="text" name="category" id="edit-category" class="form-control">
+                </div>
+                <div class="mb-4">
+                    <label for="edit-price" class="block text-sm font-medium text-gray-700">Prix</label>
+                    <input type="number" name="price" id="edit-price" min="0" step="0.01" class="form-control" required>
                 </div>
                 <div class="mb-4">
                     <label for="edit-image" class="block text-sm font-medium text-gray-700">Image</label>
@@ -1126,6 +1190,42 @@
         </div>
     </div>
 
+    <!-- Modal Répondre avec formulaire intégré -->
+    <div id="reply-modal" class="hidden fixed inset-0 modal-backdrop flex items-center justify-center">
+        <div class="modal-panel max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-primary">Répondre au message</h3>
+                <button type="button" onclick="closeReplyModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="reply-content">
+                <form id="reply-form" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" id="reply-message-id">
+                    <div>
+                        <label for="reply-to" class="block text-sm font-medium text-gray-700 mb-1">À</label>
+                        <input type="text" id="reply-to" class="form-control" readonly>
+                    </div>
+                    <div>
+                        <label for="reply-subject" class="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
+                        <input type="text" id="reply-subject" class="form-control" readonly>
+                    </div>
+                    <div>
+                        <label for="reply-message" class="block text-sm font-medium text-gray-700 mb-1">Votre réponse</label>
+                        <textarea id="reply-message" name="reply" class="form-control" rows="6" required placeholder="Écrivez votre réponse ici..."></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" onclick="closeReplyModal()" class="btn-primary">Annuler</button>
+                        <button type="submit" class="btn" style="background:#10b981;color:white;">
+                            <i class="fas fa-paper-plane mr-2"></i>Envoyer la réponse
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwindcss.min.js"></script>
@@ -1206,6 +1306,72 @@
             document.getElementById('delete-user-modal').classList.remove('hidden');
         }
 
+        // Fonctions pour le modal de réponse - CORRIGÉ
+        function openReplyModal(messageId, subject, email) {
+            const modal = document.getElementById('reply-modal');
+            modal.classList.remove('hidden');
+            
+            // Remplir les champs du formulaire
+            document.getElementById('reply-message-id').value = messageId;
+            document.getElementById('reply-to').value = email || 'Anonyme';
+            document.getElementById('reply-subject').value = 'Re: ' + subject;
+            document.getElementById('reply-message').value = '';
+        }
+
+        function closeReplyModal() {
+            document.getElementById('reply-modal').classList.add('hidden');
+        }
+
+        // Gestion du formulaire de réponse - CORRIGÉ SELON TON URLS.PY
+        document.getElementById('reply-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageId = document.getElementById('reply-message-id').value;
+            const reply = document.getElementById('reply-message').value.trim();
+            
+            if (!reply) {
+                alert('Veuillez écrire une réponse');
+                return;
+            }
+
+            // SELON TON URLS.PY, L'URL API EST : /contact/api/messages/{id}/
+            // Car tu as app_name='contact' et path('api/messages/<int:id>/', ...)
+            const url = `/contact/api/messages/${messageId}/`;
+            console.log('Envoi de la réponse à:', url);
+            
+            try {
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ reply: reply })
+                });
+
+                if (res.ok) {
+                    alert('Réponse envoyée avec succès !');
+                    closeReplyModal();
+                    location.reload();
+                } else {
+                    console.log('Status de la réponse:', res.status);
+                    console.log('Headers:', res.headers);
+                    
+                    // Essaie de lire le message d'erreur
+                    try {
+                        const error = await res.json();
+                        alert('Erreur lors de l\'envoi: ' + (error.detail || JSON.stringify(error)));
+                    } catch (parseError) {
+                        const textError = await res.text();
+                        alert('Erreur ' + res.status + ': ' + textError);
+                    }
+                }
+            } catch (err) {
+                console.error('Erreur réseau:', err);
+                alert('Erreur réseau: ' + err.message);
+            }
+        });
+
         // Créer Utilisateur
         document.getElementById('create-user-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1233,7 +1399,7 @@
             const id = document.getElementById('edit-user-id').value;
             const data = new FormData(this);
             try {
-                const res = await fetch(`/users/user/${id}/edit/`, {
+                const res = await fetch(`/users/users/${id}/edit/`, {
                     method: 'POST',
                     headers: { 'X-CSRFToken': csrfToken },
                     body: data
@@ -1298,6 +1464,7 @@
                 document.getElementById('edit-description').value = btn.dataset.description;
                 document.getElementById('edit-content').value = btn.dataset.content;
                 document.getElementById('edit-category').value = btn.dataset.category;
+                document.getElementById('edit-price').value = btn.dataset.price || '0.00';
                 document.getElementById('edit-published').checked = btn.dataset.published === 'true';
                 document.getElementById('current-image').innerText = btn.dataset.image 
                     ? `Image actuelle : ${btn.dataset.image}`
